@@ -22,7 +22,8 @@ class Users:
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone)
 		"""
-		Add a user to the 'users' table (the username is randomly generated)
+		Add a user to the 'users' table and return the randomly generated
+		username
 		"""
 
 		pass
