@@ -1,5 +1,5 @@
-class Login:
-	"""Login or sign up using the 'users' table"""
+class Users:
+	"""Get or add users using the 'users' table"""
 
 	_TABLE_NAME = "users"
 
