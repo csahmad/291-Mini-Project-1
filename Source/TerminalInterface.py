@@ -6,6 +6,7 @@ from Constants import Constants
 class TerminalInterface:
 	"""Static methods for implementing a terminal interface"""
 
+	@staticmethod
 	def login(usernamePrompt = "username:", passwordPrompt = "password:"):
 		"""
 		Prompt a user to login and return the entered username and password as
