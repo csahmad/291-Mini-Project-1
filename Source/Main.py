@@ -12,7 +12,7 @@ class Main:
 		connection = OracleTerminalConnection.connect()
 		cursor = connection.cursor()
 
-		I
+		pass
 
 		connection.close()
 

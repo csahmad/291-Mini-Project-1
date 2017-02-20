@@ -10,7 +10,7 @@ class Login:
 		table
 		"""
 
-		cur
+		pass
 
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone)
@@ -18,9 +18,9 @@ class Login:
 		Add a user to the 'users' table (the username is randomly generated)
 		"""
 
-		I
+		pass
 
-		cursor.execute(
-		"insert into ${0} values ($'{1}', $'{2}', ${3}, ${4}, ${5}, ${6})".format(
-			Login._TABLE_NAME, username, password, name, email, city,
-				timezone))
+		#cursor.execute(
+		#"insert into ${0} values ($'{1}', $'{2}', ${3}, ${4}, ${5}, ${6})".format(
+		#	Login._TABLE_NAME, username, password, name, email, city,
+		#		timezone))
