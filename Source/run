@@ -1,0 +1,35 @@
+# Run the program
+
+MAIN=OracleTerminalConnection
+PYTHON=python3
+CLEAN="true"
+
+EXPORT_DYLD="false"
+DYLD_PATH=/Users/oahmad/instantclient_12_1
+
+if [ $EXPORT_DYLD = "true" ]
+then
+    export DYLD_LIBRARY_PATH=$DYLD_PATH
+fi
+
+# If no arguments given, pass $MAIN to $PYTHON
+if [ $# -eq 0 ]
+then
+    $PYTHON $MAIN.py
+
+# Otherwise, pass the given arguments to $PYTHON
+else
+    $PYTHON $@
+fi
+
+# If we should clean...
+if [ $CLEAN = "true" ]
+then
+
+	# If there is a makefile, run "make clean" (obviously fails if there is no
+	# "clean" in the makefile)
+	if [ -f Makefile ] || [ -f makefile ] || [ -f MAKEFILE ] || [ -f MakeFile ]
+	then
+	    make clean
+	fi
+fi

@@ -1,0 +1,18 @@
+# Copy all files in this folder to a folder in the lab machine
+
+TARGET_FOLDER=Data
+TARGET_MACHINE=ohaton.cs.ualberta.ca
+
+# If no arguments given, ask for username
+if [ $# -eq 0 ]
+then
+    printf "username:"
+    read username
+
+# Otherwise, set username to the first argument given
+else
+    username=$1
+fi
+
+# [!.]*: everything but hidden
+scp -pr [!.]* $username@$TARGET_MACHINE:$TARGET_FOLDER
