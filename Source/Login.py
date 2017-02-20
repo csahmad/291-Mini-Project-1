@@ -6,11 +6,18 @@ class Login:
 	@staticmethod
 	def getUser(cursor, username, password)
 		"""
-		Get the user with the given username and password from the 'users'
-		table
+		Return the user with the given username and password from the 'users'
+		table (return None if no such user)
 		"""
 
-		pass
+		cursor.execute("select usr from ${0}" +
+			"where usr='${1}' and pwd='${2}'".format(
+				Login._TABLE_NAME, username, password))
+
+		results = cursor.fetchall()
+
+		if len(results) == 0: return None
+		return results[0][0]
 
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone)
