@@ -45,6 +45,59 @@ class TableTools:
 
 		return "rank() over({0}) {1}) {2}".format(over, order, statementName)
 
+class Tweet:
+	"""Represents a tweet"""
+
+	def __init__(self, tweetID, writer, date, text, replyTo = None):
+
+		if replyTo == "null": replyTo = None
+		self._tweetID = tweetID
+		self._writer = writer
+		self._date = date
+		self._text = text
+		self._replyTo = replyTo
+
+	def __str__(self):
+
+		if self._replyTo is None:
+			replyToString = ""
+
+		else:
+			replyToString = "@{0} ".format(replyTo)
+
+		return "{0}: {1}{2} ({3})".format(self._writer, replyToString,
+			self._text, self._date)
+
+	@property
+	def tweetID(self):
+		"""Return the tweet ID"""
+
+		return self._tweetID
+
+	@property
+	def writer(self):
+		"""Return the writer of the tweet"""
+
+		return self._writer
+
+	@property
+	def date(self):
+		"""Return the date the tweet was written"""
+
+		return self._date
+
+	@property
+	def text(self):
+		"""Return the tweet text"""
+
+		return self._text
+
+	@property
+	def replyTo(self):
+		"""Return the tweet ID this tweet is a reply to or None"""
+
+		return self._replyTo
+
 class TweetsTableTools:
 	"""Tools for working with the 'Tweets' table"""
 
@@ -55,7 +108,7 @@ class TweetsTableTools:
 		"""
 		Yield each tweet from the given user by date (recent first)
 
-		Return in format (tid, tdate, text, replyto)
+		Yield as Tweet object
 
 		Keyword arguments:
         userID -- the ID of the writer of the tweets
@@ -78,7 +131,7 @@ class TweetsTableTools:
 
 		while result is not None:
 
-			yield result
+			yield Tweet(result[0], userID, result[1], result[2], result[3])
 
 			i += 1
 
