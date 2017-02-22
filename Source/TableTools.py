@@ -139,6 +139,24 @@ class TweetsTableTools:
 	_FOLLOWS_TABLE = "Follows"
 
 	@staticmethod
+	def addTweet(cursor, writer, date, text, tweetID, replyTo = None):
+		"""Add the given tweet to the 'Tweets' table"""
+
+		# Add quotation marks to text
+		text = TableTools.addQuotes(text)
+
+		# Replace None with "null"
+		writer = TableTools.replaceWithNull(writer)
+		date = TableTools.replaceWithNull(date)
+		text = TableTools.replaceWithNull(text)
+		replyTo = TableTools.replaceWithNull(replyTo)
+
+		cursor.execute(
+			"insert into {0} values ({1}, {2}, {3}, {4}, {5})".format(
+				TweetsTableTools._TWEETS_TABLE, tweetID, writer, date, text,
+				replyTo))
+
+	@staticmethod
 	def getFolloweeTweetsByDate(cursor, follower):
 		"""
 		Yield each tweet from the followees of the given user by date (recent
@@ -271,7 +289,6 @@ class UsersTableTools:
 		city = TableTools.addQuotes(city)
 
 		# Replace None with "null"
-		userID = TableTools.replaceWithNull(userID)
 		password = TableTools.replaceWithNull(password)
 		name = TableTools.replaceWithNull(name)
 		email = TableTools.replaceWithNull(email)
