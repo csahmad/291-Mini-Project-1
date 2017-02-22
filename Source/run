@@ -1,6 +1,6 @@
 # Run the program
 
-MAIN=OracleTerminalConnection
+MAIN=Main
 PYTHON=python3
 CLEAN="true"
 
