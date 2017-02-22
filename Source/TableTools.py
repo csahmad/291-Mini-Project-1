@@ -104,7 +104,7 @@ class TweetsTableTools:
 	_TWEETS_TABLE = "Tweets"
 
 	@staticmethod
-	def getTweetsByDate(cursor, userID, amount = None):
+	def getTweetsByDate(cursor, userID):
 		"""
 		Yield each tweet from the given user by date (recent first)
 
@@ -112,8 +112,6 @@ class TweetsTableTools:
 
 		Keyword arguments:
         userID -- the ID of the writer of the tweets
-        amount -- the maximum number of tweets to yield or None (to yield all
-        	tweets)
 		"""
 
 		columns = "tid, tdate, text, replyto"
@@ -134,8 +132,6 @@ class TweetsTableTools:
 			yield Tweet(result[0], userID, result[1], result[2], result[3])
 
 			i += 1
-
-			if amount is not None and i > amount: break
 
 			cursor.execute("select {0} from ({1}) where rank = {2}".format(
 				columns, rankedSelect, i))
