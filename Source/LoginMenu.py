@@ -1,5 +1,6 @@
 from TerminalMenu import TerminalMenu
 from TerminalForm import TerminalForm, FormField
+from TerminalInterface import TerminalInterface
 from IDGenerator import IDGenerator
 
 class LoginMenu:
