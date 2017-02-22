@@ -10,6 +10,7 @@ drop table users;
 
 create table users (
   usr         int,
+  pwd         char(4),
   name        char(20),
   email       char(15),
   city        char(12),
@@ -25,35 +26,33 @@ create table follows (
   foreign key (flwee) references users
 );
 create table tweets (
+  tid         int,
   writer      int,
   tdate       date,
   text        char(80),
-  replyto_w   int,
-  replyto_d   date,
-  primary key (writer,tdate),
+  replyto     int,
+  primary key (tid),
   foreign key (writer) references users,
-  foreign key (replyto_w,replyto_d) references tweets
+  foreign key (replyto) references tweets
 );
 create table hashtags (
   term        char(10),
   primary key (term)
 );
 create table mentions (
-  writer      int,
-  tdate       date,
+  tid         int,
   term        char(10),
-  primary key (writer,tdate,term),
-  foreign key (writer,tdate) references tweets,
+  primary key (tid,term),
+  foreign key (tid) references tweets,
   foreign key (term) references hashtags
 );
 create table retweets (
   usr         int,
-  writer      int,
-  tdate       date,
+  tid         int,
   rdate       date,
-  primary key (usr,writer,tdate),
+  primary key (usr,tid),
   foreign key (usr) references users,
-  foreign key (writer,tdate) references tweets
+  foreign key (tid) references tweets
 );
 create table lists (
   lname        char(12),
