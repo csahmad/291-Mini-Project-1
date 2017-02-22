@@ -1,3 +1,5 @@
+from IDGenerator import IDGenerator
+
 class TableTools:
 	"""Static methods for getting information about tables"""
 
@@ -19,6 +21,23 @@ class UsersTableTools:
 
 	_USERS_TABLE = "Users"
 	_MAX_PASSWORD_LENGTH = 4
+
+	@staticmethod
+	def addUser(cursor, password, name, email, city, timezone, userID = None):
+		"""Add a new user (userID generated if none given)"""
+
+		if userID is None: userID = IDGenerator.getNewUserID(cursor)
+
+		# Add quotation marks to string values
+		password = "'${0}'".format(password)
+		name = "'${0}'".format(name)
+		email = "'${0}'".format(email)
+		city = "'${0}'".format(city)
+
+		values = (password, name, email, city, timezone, userID)
+
+		cursor.execute("insert into ${0} values ${1}".format(
+			UsersTableTools._USERS_TABLE, str(values)))
 
 	@staticmethod
 	def userExists(cursor, userID):
