@@ -1,14 +1,25 @@
 import cx_Oracle
 
-class SearchTweet:
+class Search:
     def formatsearch (keyword):
         result = '%{0}%'.format(keyword.upper())
         print(result)
         return result
 
     def search(cursor, keyword):
-        """Return whether the given string value exists in the given table"""
-        fkeyword = SearchTweet.formatsearch(keyword)
+        first = keyword[0].strip()
+        if first=='#' :
+            Search.searchmentions(cursor, keyword.strip('#'))
+        else:
+            Search.searchtweet(cursor, keyword)
+
+    def searchmentions(cursor, keyword):
+        print("to be searched %s" % keyword)
+        fkeyword = Search.formatsearch(keyword)
+        cursor.execute("select * from mentions where upper(term) like '{0}".format(fkeyword))
+
+    def searchtweet(cursor, keyword):
+        fkeyword = Search.formatsearch(keyword)
         cursor.execute("select tid, text from tweets where upper(text) like '{0}'".format(fkeyword))
         result = cursor.fetchall()
         print("--------------------------------")
@@ -35,6 +46,6 @@ if __name__ == "__main__":
     cursor = connection.cursor()
     print()
     keyword = input("enter keyword to search: ")
-    SearchTweet.search(cursor, keyword)
+    Search.search(cursor, keyword)
 
     connection.close()
