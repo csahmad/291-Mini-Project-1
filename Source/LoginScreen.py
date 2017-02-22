@@ -1,6 +1,6 @@
-from Login import Login
+from TerminalInterface import TerminalInterface
 
 class LoginScreen:
-	"""I"""
+	"""The login screen for the terminal interface"""
 
 	pass
