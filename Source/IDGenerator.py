@@ -4,6 +4,12 @@ class IDGenerator:
 	"""Generate unique values for columns in tables"""
 
 	@staticmethod
+	def getNewTweetID(cursor):
+		"""Return a tweet ID that does not exist in the Tweets table"""
+
+		return IDGenerator.getNewInt(cursor, "Tweets", "tid")
+
+	@staticmethod
 	def getNewUserID(cursor):
 		"""Return a user ID that does not exist in the Users table"""
 
