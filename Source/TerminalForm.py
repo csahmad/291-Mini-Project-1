@@ -28,9 +28,10 @@ class TerminalFormResults:
 	def _makeEmptyNone(self):
 		"""Replace empty strings with None"""
 
-		for i in range(0, len(self._values)):
-			value = self._values[i]
-			if value == "": self._values[i] = None
+		if self._values is None: return
+
+		for key, value in self._values.items():
+			if value == "": self._values[key] = None
 
 	@property
 	def values(self):
