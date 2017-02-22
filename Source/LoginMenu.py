@@ -38,7 +38,7 @@ class LoginMenu:
 			preMessage = "Invalid username or password"
 
 		else:
-			preMessage = ""
+			preMessage = None
 
 		menu = TerminalMenu(LoginMenu._MENU_OPTIONS, preMessage)
 		choice = menu.showAndGet()
