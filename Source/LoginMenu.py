@@ -70,7 +70,7 @@ class LoginMenu:
 
 				userID = IDGenerator.getNewUserID(cursor)
 
-				TableTools.addUser(values[0], values[1], values[2],
+				UsersTableTools.addUser(values[0], values[1], values[2],
 					values[3], values[4], userID)
 
 				return userID
