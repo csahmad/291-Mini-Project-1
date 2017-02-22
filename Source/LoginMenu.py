@@ -91,7 +91,8 @@ class LoginMenu:
 		Let the user login and return the user ID or None (if login failed)
 		"""
 
-		userString, password = TerminalInterface.login(integerUsername = True)
+		userString, password = TerminalInterface.login("user id:",
+			integerUsername = True)
 		userID = int(userString)
 
 		if UsersTableTools.loginExists(cursor, userID, password):
