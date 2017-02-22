@@ -2,7 +2,7 @@ from TerminalMenu import TerminalMenu
 from TerminalForm import TerminalForm, FormField
 from TerminalInterface import TerminalInterface
 from IDGenerator import IDGenerator
-from UsersTableTools import UsersTableTools
+from TableTools import UsersTableTools
 
 class LoginMenu:
 	"""The login/signup menu for the terminal interface"""
