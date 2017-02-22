@@ -1,3 +1,5 @@
+from TableMethods import TableMethods
+
 class IDGenerator:
 	"""Generate unique values for columns in tables"""
 
@@ -9,4 +11,7 @@ class IDGenerator:
 
 		unique = 0
 
-		pass
+		while TableTools.stringExists(cursor, tableName, columnName, unique):
+			unique += 1
+
+		return unique
