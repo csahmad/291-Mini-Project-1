@@ -1,5 +1,6 @@
 from OracleTerminalConnection import OracleTerminalConnection
 from LoginMenu import LoginMenu
+from TerminalInterface import TerminalInterface
 
 class Main:
 	"""Run the program"""
@@ -18,12 +19,19 @@ class Main:
 
 		# If an exit key was pressed, show exit message and exit
 		if user is None:
-			print(Main._EXIT_MESSAGE)
+			Main._showExitMessage()
 			return
 
 		pass
 
 		connection.close()
+
+	@staticmethod
+	def _showExitMessage():
+		"""Show the exit message"""
+
+		TerminalInterface.tryClear()
+		print(Main._EXIT_MESSAGE)
 
 if __name__ == "__main__":
 	Main.main()
