@@ -1,6 +1,7 @@
 from OracleTerminalConnection import OracleTerminalConnection
 from LoginMenu import LoginMenu
 from TerminalInterface import TerminalInterface
+from MainMenu import MainMenu
 
 class Main:
 	"""Run the program"""
@@ -22,7 +23,10 @@ class Main:
 			Main._showExitMessage()
 			return
 
-		pass
+		mainMenu = MainMenu(cursor)
+		mainMenu.show()
+
+		Main._showExitMessage()
 
 		connection.close()
 
