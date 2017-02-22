@@ -104,6 +104,20 @@ class TweetsTableTools:
 	_TWEETS_TABLE = "Tweets"
 
 	@staticmethod
+	def getFolloweeTweetsByDate(cursor, follower):
+		"""
+		Yield each tweet from the followees of the given user by date (recent
+		first)
+
+		Yield as Tweet object
+
+		Keyword arguments:
+        follower -- the ID of the follower
+		"""
+
+		pass
+
+	@staticmethod
 	def getTweetsByDate(cursor, userID):
 		"""
 		Yield each tweet from the given user by date (recent first)
