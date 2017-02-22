@@ -12,6 +12,8 @@ class Main:
 		connection = OracleTerminalConnection.connect()
 		cursor = connection.cursor()
 
+		user = LoginMenu.getUser(cursor)
+
 		pass
 
 		connection.close()

@@ -1,6 +1,7 @@
 from Constants import Constants
 from TerminalInterface import TerminalInterface
 from KeypressDetector import KeypressDetector
+from CheckStringFormat import CheckStringFormat
 
 class TerminalFormResults:
 	"""The results of a terminal form"""
@@ -13,9 +14,27 @@ class TerminalFormResults:
 			form (as opposed to just choosing the cancel option)
 		"""
 
-		self.submitted = fields is not None
-		self.values = TerminalFormResults._extractValues(fields)
-		self.exitKeyPressed = exitKeyPressed
+		self._submitted = fields is not None
+		self._values = TerminalFormResults._extractValues(fields)
+		self._exitKeyPressed = exitKeyPressed
+
+	@property
+	def submitted(self):
+		"""Return whether the form was submitted"""
+
+		return self._submitted
+
+	@property
+	def values(self):
+		"""Return the values saved in the form"""
+
+		return self._values
+
+	@property
+	def exitKeyPressed(self):
+		"""Return whether the user used an exit key to exit the form"""
+
+		return self._exitKeyPressed
 
 	@staticmethod
 	def _extractValues(fields):
@@ -30,34 +49,45 @@ class TerminalFormResults:
 
 		if fields is None: return None
 		values = {}
-		for field in fields: values[field.getName()] = field.value
+		for field in fields: values[field.name] = field.value
 		return values
 
 class FormField:
 	"""A form field"""
 
-	def __init__(self, name, maxValueLength, value = ""):
+	def __init__(self, name, maxValueLength = None, isNumeric = False,
+		value = ""):
 		"""
 		Keyword arguments:
         name -- the name/label of this field
         maxValueLength -- the maximum allowed length of the value for this
-        	field
+        	field (required if not numeric)
+        isNumeric -- whether this field can only have a numeric value
         value -- the initial value of this field
 		"""
 
 		self._name = name
 		self._maxValueLength = maxValueLength
+		self._isNumeric = isNumeric
 		self.value = value
 
-	def getName(self):
+	@property
+	def name(self):
 		"""Get the name of this field"""
 
 		return self._name
 
-	def getMaxValueLength(self):
+	@property
+	def maxValueLength(self):
 		"""Get the maximum allowed length of the value of this field"""
 
 		return self._maxValueLength
+
+	@property
+	def isNumeric(self):
+		"""Return whether this field can only have a numeric value"""
+
+		return self._isNumeric
 
 class TerminalForm:
 	"""A form for a terminal interface"""
@@ -202,16 +232,28 @@ class TerminalForm:
 
 		TerminalInterface.tryClear()
 		field = self._fields[self._selected]
-		fieldLabel = field.getName() + TerminalForm._FIELD_NAME_END
-		tooLongMessage = "Value cannot be longer than " + \
-			str(field.getMaxValueLength()) + " characters"
+		fieldLabel = field.name + TerminalForm._FIELD_NAME_END
 
 		value = input(fieldLabel)
 
-		while len(value) > field.getMaxValueLength():
-			TerminalInterface.tryClear()
-			print(tooLongMessage)
-			value = input(fieldLabel)
+		if field.isNumeric:
+
+			notNumericMessage = "Value must be numeric"
+
+			while not CheckStringFormat.isNumeric(value):
+				TerminalInterface.tryClear()
+				print(notNumericMessage)
+				value = input(fieldLabel)
+
+		else:
+
+			tooLongMessage = "Value cannot be longer than " + \
+				str(field.maxValueLength) + " characters"
+
+			while len(value) > field.maxValueLength:
+				TerminalInterface.tryClear()
+				print(tooLongMessage)
+				value = input(fieldLabel)
 
 		field.value = value
 		self._show()
@@ -252,7 +294,7 @@ class TerminalForm:
 			else:
 				print(Constants.UNSELECTED_STRING, end="")
 
-			print(field.getName() + TerminalForm._FIELD_NAME_END + field.value)
+			print(field.name + TerminalForm._FIELD_NAME_END + field.value)
 
 			i += 1
 
@@ -260,7 +302,8 @@ class TerminalForm:
 if __name__ == "__main__":
 
 	fields = [FormField("Length 1 String", 1), FormField("Length 2 String", 2),
-		FormField("Length 3 String", 3), FormField("Length 4 String", 4)]
+		FormField("Length 3 String", 3),
+		FormField("Number", isNumeric = True)]
 
 	form = TerminalForm(fields)
 	form.showAndGet()
