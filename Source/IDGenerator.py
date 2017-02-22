@@ -1,4 +1,4 @@
-from TableMethods import TableMethods
+from TableTools import TableTools
 
 class IDGenerator:
 	"""Generate unique values for columns in tables"""
@@ -10,7 +10,7 @@ class IDGenerator:
 		return IDGenerator.getNewInt(cursor, "Users", "usr")
 
 	@staticmethod
-	def getNewInt(cursor, tableName, columnName)
+	def getNewInt(cursor, tableName, columnName):
 		"""
 		Return an integer that is not in the given column of the given table
 		"""
