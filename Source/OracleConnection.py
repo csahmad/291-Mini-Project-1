@@ -21,7 +21,7 @@ class OracleConnection:
 		"""
 
 		# If no connection string provided, use settings in Constants
-		if connectionString == None:
+		if connectionString is None:
 			connectionString = Constants.CONNECTION_STRING
 
 		return cx_Oracle.connect(username, password, connectionString)
