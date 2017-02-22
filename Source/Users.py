@@ -12,8 +12,8 @@ class Users:
 		table (return None if no such user)
 		"""
 
-		cursor.execute("select usr from ${0}" +
-			"where usr='${1}' and pwd='${2}'".format(
+		cursor.execute("select usr from {0}" +
+			"where usr='{1}' and pwd='{2}'".format(
 				Login._TABLE_NAME, username, password))
 
 		results = cursor.fetchone()
@@ -30,7 +30,7 @@ class Users:
 
 		username = IDGenerator.getUniqueInt(cursor, _TABLE_NAME, "usr")
 
-		cursor.execute("insert into ${0} values" +
-			"($'{1}', $'{2}', ${3}, ${4}, ${5}, ${6})".format(
+		cursor.execute("insert into {0} values" +
+			"($'{1}', $'{2}', {3}, {4}, {5}, {6})".format(
 				Login._TABLE_NAME, username, password, name, email, city,
 					timezone))

@@ -6,7 +6,7 @@ class TableTools:
 		"""Return whether the given string value exists in the given table"""
 
 		cursor.execute(
-			"select unique ${1} from ${0} where ${1} = ${2}".format(
+			"select unique {1} from {0} where {1} = {2}".format(
 				tableName, columnName, item))
 
 		results = cursor.fetchone()
@@ -27,14 +27,14 @@ class UsersTableTools:
 		userID = IDGenerator.getNewUserID(cursor)
 
 		# Add quotation marks to string values
-		password = "'${0}'".format(password)
-		name = "'${0}'".format(name)
-		email = "'${0}'".format(email)
-		city = "'${0}'".format(city)
+		password = "'{0}'".format(password)
+		name = "'{0}'".format(name)
+		email = "'{0}'".format(email)
+		city = "'{0}'".format(city)
 
 		values = (password, name, email, city, timezone, str(userID))
 
-		cursor.execute("insert into ${0} values ${1}".format(
+		cursor.execute("insert into {0} values {1}".format(
 			UsersTableTools._USERS_TABLE, str(values)))
 
 	@staticmethod
@@ -50,9 +50,14 @@ class UsersTableTools:
 
 		if len(password) > UsersTableTools._MAX_PASSWORD_LENGTH: return False
 
+		print("select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
+			UsersTableTools._USERS_TABLE, userID, password))
+
+		print("\n\n")
+
 		cursor.execute(
-			"select usr, pwd from ${0} where usr = ${1} and pwd = ${2}".format(
-				UsersTableTools._USERS_TABLE, userID, password))
+		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
+			UsersTableTools._USERS_TABLE, userID, password))
 
 		results = cursor.fetchone()
 
