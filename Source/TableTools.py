@@ -102,6 +102,7 @@ class TweetsTableTools:
 	"""Tools for working with the 'Tweets' table"""
 
 	_TWEETS_TABLE = "Tweets"
+	_FOLLOWS_TABLE = "Follows"
 
 	@staticmethod
 	def getFolloweeTweetsByDate(cursor, follower):
@@ -115,7 +116,30 @@ class TweetsTableTools:
         follower -- the ID of the follower
 		"""
 
-		pass
+		columns = "tid, writer, tdate, text, replyto"
+
+		rankStatement = TableTools.rankStatement("max(tdate)")
+
+		rankedSelect = "select {0}, {1} from {2}, {3} ".format(
+			columns, rankStatement, TweetsTableTools._TWEETS_TABLE,
+			TweetsTableTools._FOLLOWS_TABLE) + \
+			"where flwer = writer and {0} and writer = flwee".format(follower)
+
+		cursor.execute("select {0} from ({1}) where rank = 1".format(
+			columns, rankedSelect))
+
+		result = cursor.fetchone()
+
+		i = 1
+
+		while result is not None:
+
+			yield Tweet(result[0], result[1], result[2], result[3], result[4])
+
+			i += 1
+
+			cursor.execute("select {0} from ({1}) where rank = {2}".format(
+				columns, rankedSelect, i))
 
 	@staticmethod
 	def getTweetsByDate(cursor, userID):
@@ -131,8 +155,8 @@ class TweetsTableTools:
 		columns = "tid, tdate, text, replyto"
 
 		rankStatement = TableTools.rankStatement("max(tdate)")
-		rankedSelect = "select {0}, {1}".format(columns,
-			rankStatement) + "from {0}".format(TweetsTableTools._TWEETS_TABLE)
+		rankedSelect = "select {0}, {1} from {2}".format(columns,
+			rankStatement, TweetsTableTools._TWEETS_TABLE)
 
 		cursor.execute("select {0} from ({1}) where rank = 1".format(
 			columns, rankedSelect))
