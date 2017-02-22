@@ -32,8 +32,26 @@ class TableTools:
 		if string is None: return "null"
 		return string
 
+class FollowsTableTools:
+	"""Tools for working with the 'Follows' table"""
+
+	_FOLLOWS_TABLE = "Follows"
+
+	@staticmethod
+	def getFollowing(cursor, follower):
+		"""Yield the user ID for each person being followed by follower"""
+
+		cursor.execute("select flwee from {0} where flwer = '{1}'".format(
+			FollowsTableTools._FOLLOWS_TABLE, follower))
+
+		result = cursor.fetchone()
+
+		while result is not None:
+			yield result[1]
+			result = cursor.fetchone()
+
 class UsersTableTools:
-	"""Static methods for getting data from the 'Users' table"""
+	"""Tools for working with the 'Users' table"""
 
 	_USERS_TABLE = "Users"
 	_MAX_PASSWORD_LENGTH = 4
