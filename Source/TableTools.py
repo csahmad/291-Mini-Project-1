@@ -25,6 +25,13 @@ class TableTools:
 		if stringValue is None: return None
 		return "'{0}'".format(stringValue)
 
+	@staticmethod
+	def replaceWithNull(string):
+		"""If None passed, return 'null', otherwise return string"""
+
+		if string is None: return "null"
+		return string
+
 class UsersTableTools:
 	"""Static methods for getting data from the 'Users' table"""
 
@@ -41,14 +48,18 @@ class UsersTableTools:
 		email = TableTools.addQuotes(email)
 		city = TableTools.addQuotes(city)
 
-		values = (str(userID), password, name, email, city, timezone)
+		# Replace None with "null"
+		userID = TableTools.replaceWithNull(userID)
+		password = TableTools.replaceWithNull(password)
+		name = TableTools.replaceWithNull(name)
+		email = TableTools.replaceWithNull(email)
+		city = TableTools.replaceWithNull(city)
+		timezone = TableTools.replaceWithNull(timezone)
 
 		insertStatement = "insert into {0} values ".format(
 			UsersTableTools._USERS_TABLE) + \
 			"({0}, {1}, {2}, {3}, {4}, {5})".format(
 			userID, password, name, email, city, timezone)
-
-		print(insertStatement)
 
 		cursor.execute(insertStatement)
 
