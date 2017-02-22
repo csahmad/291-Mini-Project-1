@@ -39,7 +39,7 @@ class LoginMenu:
 			preMessage = "Invalid username or password"
 
 		else:
-			preMessage = None
+			preMessage = "Welcome to Twitter"
 
 		menu = TerminalMenu(LoginMenu._MENU_OPTIONS, preMessage)
 		choice = menu.showAndGet()
