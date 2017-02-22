@@ -43,7 +43,8 @@ class TableTools:
 		else:
 			order = "asc"
 
-		return "rank() over({0}) {1}) {2}".format(over, order, statementName)
+		return "rank() over(order by {0}) {1}) {2}".format(over, order,
+			statementName)
 
 	@staticmethod
 	def yieldResults(cursor, statement):
@@ -151,7 +152,7 @@ class TweetsTableTools:
 
 		columns = "tid, writer, tdate, text, replyto"
 
-		rankStatement = TableTools.rankStatement("max(tdate)")
+		rankStatement = TableTools.rankStatement("tdate")
 
 		rankedSelect = "select {0}, {1} from {2}, {3} ".format(
 			columns, rankStatement, TweetsTableTools._TWEETS_TABLE,
@@ -174,7 +175,7 @@ class TweetsTableTools:
 
 		columns = "tid, tdate, text, replyto"
 
-		rankStatement = TableTools.rankStatement("max(tdate)")
+		rankStatement = TableTools.rankStatement("tdate")
 		rankedSelect = "select {0}, {1} from {2}".format(columns,
 			rankStatement, TweetsTableTools._TWEETS_TABLE)
 
@@ -232,7 +233,7 @@ class UsersTableTools:
 		length)
 		"""
 
-		rankStatement = TableTools.rankStatement("max(length(usr))",
+		rankStatement = TableTools.rankStatement("length(usr)",
 			descending = False)
 
 		rankedSelect = \
@@ -249,7 +250,7 @@ class UsersTableTools:
 		length)
 		"""
 
-		rankStatement = TableTools.rankStatement("max(length(city))",
+		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
 		rankedSelect = \
