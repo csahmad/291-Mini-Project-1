@@ -1,5 +1,5 @@
 from TerminalMenu import TerminalMenu
-from TerminalForm import TerminalForm
+from TerminalForm import TerminalForm, FormField
 from IDGenerator import IDGenerator
 
 class LoginMenu:
@@ -10,9 +10,9 @@ class LoginMenu:
 
 	_MENU_OPTIONS = ("Sign in", "Sign up")
 
-	_FORM_FIELDS = [Field("Password", 4), Field("Name", 20),
-		Field("Email", 15), Field("City", 12),
-		Field("Timezone", isNumeric = True)]
+	_FORM_FIELDS = [FormField("Password", 4), FormField("Name", 20),
+		FormField("Email", 15), FormField("City", 12),
+		FormField("Timezone", isNumeric = True)]
 
 	@staticmethod
 	def getUser(cursor):
@@ -97,6 +97,8 @@ class LoginMenu:
 
 # Interactive test
 if __name__ == "__main__":
+
+	from OracleTerminalConnection import OracleTerminalConnection
 
 	# Get connection to database and cursor
 	connection = OracleTerminalConnection.connect()
