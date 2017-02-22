@@ -1,5 +1,5 @@
 from OracleTerminalConnection import OracleTerminalConnection
-from LoginScreen import LoginScreen
+from LoginMenu import LoginMenu
 
 class Main:
 	"""Run the program"""
