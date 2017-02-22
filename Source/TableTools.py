@@ -9,9 +9,9 @@ class TableTools:
 			"select unique {1} from {0} where {1} = {2}".format(
 				tableName, columnName, item))
 
-		results = cursor.fetchone()
+		result = cursor.fetchone()
 
-		if len(results) == 0: return False
+		if result is None: return False
 		return True
 
 class UsersTableTools:
@@ -54,7 +54,7 @@ class UsersTableTools:
 		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
 			UsersTableTools._USERS_TABLE, userID, password))
 
-		results = cursor.fetchone()
+		result = cursor.fetchone()
 
-		if len(results) == 0: return False
+		if result is None: return False
 		return True

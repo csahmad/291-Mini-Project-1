@@ -16,10 +16,10 @@ class Users:
 			"where usr='{1}' and pwd='{2}'".format(
 				Login._TABLE_NAME, username, password))
 
-		results = cursor.fetchone()
+		result = cursor.fetchone()
 
-		if len(results) == 0: return None
-		return results[0][0]
+		if result is None: return None
+		return result[0]
 
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone)
