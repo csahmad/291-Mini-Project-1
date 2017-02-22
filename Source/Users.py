@@ -16,7 +16,7 @@ class Users:
 			"where usr='${1}' and pwd='${2}'".format(
 				Login._TABLE_NAME, username, password))
 
-		results = cursor.fetchall()
+		results = cursor.fetchone()
 
 		if len(results) == 0: return None
 		return results[0][0]
