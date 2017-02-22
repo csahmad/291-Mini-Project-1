@@ -63,15 +63,17 @@ class LoginMenu:
 		else:
 
 			form = TerminalForm(LoginMenu._FORM_FIELDS)
-			values = form.showAndGet()
+			result = form.showAndGet()
 
 			# If form submitted, add user to table and return user ID
-			if values.submitted:
+			if result.submitted:
 
 				userID = IDGenerator.getNewUserID(cursor)
+				values = result.values
 
-				UsersTableTools.addUser(values[0], values[1], values[2],
-					values[3], values[4], userID)
+				UsersTableTools.addUser(cursor, values["Password"],
+					values["Name"], values["Email"], values["City"],
+					values["Timezone"], userID)
 
 				return userID
 

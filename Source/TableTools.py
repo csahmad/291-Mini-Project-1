@@ -24,8 +24,6 @@ class UsersTableTools:
 	def addUser(cursor, password, name, email, city, timezone, userID):
 		"""Add a new user"""
 
-		userID = IDGenerator.getNewUserID(cursor)
-
 		# Add quotation marks to string values
 		password = "'{0}'".format(password)
 		name = "'{0}'".format(name)
