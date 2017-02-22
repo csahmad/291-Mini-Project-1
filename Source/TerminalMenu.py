@@ -26,6 +26,7 @@ class TerminalMenu:
 		an exit key is pressed)
 		"""
 
+		self._selected = 0
 		self._show()
 		return self._handleKeypresses()
 

@@ -85,6 +85,8 @@ class TerminalForm:
 	def showAndGet(self):
 		"""Show the form and return a TerminalFormResults"""
 
+		self._selected = 0
+
 		while self._results is None:
 			self._show()
 			self._handleKeypress()
