@@ -16,6 +16,7 @@ class TerminalFormResults:
 
 		self._submitted = fields is not None
 		self._values = TerminalFormResults._extractValues(fields)
+		self._makeEmptyNone()
 		self._exitKeyPressed = exitKeyPressed
 
 	@property
@@ -23,6 +24,13 @@ class TerminalFormResults:
 		"""Return whether the form was submitted"""
 
 		return self._submitted
+
+	def _makeEmptyNone():
+		"""Replace empty strings with None"""
+
+		for i in len(self._values):
+			value = self._values[i]
+			if value == "": self._values[i] = None
 
 	@property
 	def values(self):
