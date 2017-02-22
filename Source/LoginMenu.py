@@ -100,6 +100,8 @@ if __name__ == "__main__":
 
 	from OracleTerminalConnection import OracleTerminalConnection
 
+	# Fix: connection is None
+
 	# Get connection to database and cursor
 	connection = OracleTerminalConnection.connect()
 	cursor = connection.cursor()
