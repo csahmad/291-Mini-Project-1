@@ -2,14 +2,14 @@ import cx_Oracle
 
 class SearchTweet:
     def formatsearch (keyword):
-        result = '%{0}%'.format(keyword)
+        result = '%{0}%'.format(keyword.upper())
         print(result)
         return result
 
     def search(cursor, keyword):
         """Return whether the given string value exists in the given table"""
         fkeyword = SearchTweet.formatsearch(keyword)
-        cursor.execute("select tid, text from tweets where text like '{0}'".format(fkeyword))
+        cursor.execute("select tid, text from tweets where upper(text) like '{0}'".format(fkeyword))
         result = cursor.fetchall()
         print("--------------------------------")
         for i in result:
