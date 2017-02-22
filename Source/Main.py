@@ -18,7 +18,7 @@ class Main:
 
 		# If an exit key was pressed, show exit message and exit
 		if user is None:
-			print Main._EXIT_MESSAGE
+			print(Main._EXIT_MESSAGE)
 			return
 
 		pass
