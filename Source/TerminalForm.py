@@ -141,7 +141,7 @@ class TerminalForm:
 
 			# If submit option selected, store results in self._results
 			if self._selected == TerminalForm._SUBMIT_INDEX:
-				self._results = TerminalFormResults(fields)
+				self._results = TerminalFormResults(self._fields)
 
 			# If cancel option selected, store empty results
 			elif self._selected == TerminalForm._CANCEL_INDEX:
