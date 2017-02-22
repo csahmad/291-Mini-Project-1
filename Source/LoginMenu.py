@@ -1,5 +1,6 @@
 from TerminalMenu import TerminalMenu
 from TerminalForm import TerminalForm
+from IDGenerator import IDGenerator
 
 class LoginMenu:
 	"""The login/signup menu for the terminal interface"""
@@ -49,6 +50,8 @@ class LoginMenu:
 
 			userID = LoginMenu._login(cursor)
 
+			# If invalid login, got to main login/sign up menu with error
+			# message
 			if userID is None:
 				return LoginMenu._showAndGet(cursor, True)
 
@@ -57,12 +60,26 @@ class LoginMenu:
 		# If "Sign up" chosen
 		else:
 
-			signUpForm = TerminalForm(LoginMenu._FORM_FIELDS)
-			signUpInfo = signUpForm.showAndGet()
+			form = TerminalForm(LoginMenu._FORM_FIELDS)
+			values = signUpForm.showAndGet()
 
-			if signUpInfo.submitted:
+			# If form submitted, add user to table and return user ID
+			if values.submitted:
 
-				pass
+				userID = IDGenerator.getNewUserID(cursor)
+
+				TableTools.addUser(values[0], values[1], values[2],
+					values[3], values[4], userID)
+
+				return userID
+
+			# If an exit key was pressed, return None
+			elif values.exitKeyPressed:
+				return None
+
+			# If the cancel option was chosen, go to main login/sign up menu
+			else:
+				return LoginMenu._showAndGet(cursor, True)
 
 	@staticmethod
 	def _login(cursor):
@@ -77,3 +94,7 @@ class LoginMenu:
 			return userID
 
 		return None
+
+# Interactive test
+if __name__ == "__main__":
+	pass
