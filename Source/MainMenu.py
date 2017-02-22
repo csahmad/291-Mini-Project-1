@@ -3,10 +3,12 @@ class MainMenu:
 	The main menu for the terminal interface (shown after login or sign up)
 	"""
 
-	def __init__(self, tweets):
-		"""
-		Keyword arguments:
-		tweets -- the tweets to display in the menu
-		"""
+	def __init__(self, cursor, userID):
 
-		tweetStrings = [for I]
+		self._cursor = cursor
+		self._userID = userID
+
+	def show():
+		"""Start the main menu"""
+
+		pass
