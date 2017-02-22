@@ -14,6 +14,17 @@ class TableTools:
 		if result is None: return False
 		return True
 
+	@staticmethod
+	def addQuotes(stringValue):
+		"""
+		Add single quotes around the given string value and return
+
+		Return None if None given
+		"""
+
+		if stringValue is None: return None
+		return "'{0}'".format(stringValue)
+
 class UsersTableTools:
 	"""Static methods for getting data from the 'Users' table"""
 
@@ -25,15 +36,21 @@ class UsersTableTools:
 		"""Add a new user"""
 
 		# Add quotation marks to string values
-		password = "'{0}'".format(password)
-		name = "'{0}'".format(name)
-		email = "'{0}'".format(email)
-		city = "'{0}'".format(city)
+		password = TableTools.addQuotes(password)
+		name = TableTools.addQuotes(name)
+		email = TableTools.addQuotes(email)
+		city = TableTools.addQuotes(city)
 
 		values = (str(userID), password, name, email, city, timezone)
 
-		cursor.execute("insert into {0} values {1}".format(
-			UsersTableTools._USERS_TABLE, str(values)))
+		insertStatement = "insert into {0} values ".format(
+			UsersTableTools._USERS_TABLE) + \
+			"({0}, {1}, {2}, {3}, {4}, {5})".format(
+			userID, password, name, email, city, timezone)
+
+		print(insertStatement)
+
+		cursor.execute(insertStatement)
 
 	@staticmethod
 	def userExists(cursor, userID):
