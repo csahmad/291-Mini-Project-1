@@ -32,6 +32,61 @@ class TableTools:
 		if string is None: return "null"
 		return string
 
+	@staticmethod
+	def rankStatement(over, descending = True,
+		statementName = "rank"):
+		"""Return a rank() over statement"""
+
+		if descending:
+			order = "desc"
+
+		else:
+			order = "asc"
+
+		return "rank() over({0}) {1}) {2}".format(over, order, statementName)
+
+class TweetsTableTools:
+	"""Tools for working with the 'Tweets' table"""
+
+	_TWEETS_TABLE = "Tweets"
+
+	@staticmethod
+	def getTweetsByDate(cursor, userID, amount = None):
+		"""
+		Yield each tweet from the given user by date (recent first)
+
+		Return in format (tid, tdate, text, replyto)
+
+		Keyword arguments:
+        userID -- the ID of the writer of the tweets
+        amount -- the maximum number of tweets to yield or None (to yield all
+        	tweets)
+		"""
+
+		columns = "tid, tdate, text, replyto"
+
+		rankStatement = TableTools.rankStatement("max(tdate)")
+		rankedSelect = "select {0}, {1}".format(columns,
+			rankStatement) + "from {0}".format(TweetsTableTools._TWEETS_TABLE)
+
+		cursor.execute("select {0} from ({1}) where rank = 1".format(
+			columns, rankedSelect))
+
+		result = cursor.fetchone()
+
+		i = 1
+
+		while result is not None:
+
+			yield result
+
+			i += 1
+
+			if amount is not None and i > amount: break
+
+			cursor.execute("select {0} from ({1}) where rank = {2}".format(
+				columns, rankedSelect, i))
+
 class FollowsTableTools:
 	"""Tools for working with the 'Follows' table"""
 
