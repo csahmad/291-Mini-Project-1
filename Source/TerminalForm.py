@@ -25,7 +25,7 @@ class TerminalFormResults:
 
 		return self._submitted
 
-	def _makeEmptyNone():
+	def _makeEmptyNone(self):
 		"""Replace empty strings with None"""
 
 		for i in len(self._values):
