@@ -50,11 +50,6 @@ class UsersTableTools:
 
 		if len(password) > UsersTableTools._MAX_PASSWORD_LENGTH: return False
 
-		print("select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
-			UsersTableTools._USERS_TABLE, userID, password))
-
-		print("\n\n")
-
 		cursor.execute(
 		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
 			UsersTableTools._USERS_TABLE, userID, password))
