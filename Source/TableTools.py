@@ -30,7 +30,7 @@ class UsersTableTools:
 		email = "'{0}'".format(email)
 		city = "'{0}'".format(city)
 
-		values = (password, name, email, city, timezone, str(userID))
+		values = (str(userID), password, name, email, city, timezone)
 
 		cursor.execute("insert into {0} values {1}".format(
 			UsersTableTools._USERS_TABLE, str(values)))
