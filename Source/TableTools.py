@@ -45,6 +45,39 @@ class TableTools:
 
 		return "rank() over({0}) {1}) {2}".format(over, order, statementName)
 
+	@staticmethod
+	def yieldResults(cursor, statement):
+		"""Yield each result of the given statement"""
+
+		cursor.execute(statement)
+		result = cursor.fetchone()
+
+		while result is not None:
+			yield result
+			result = cursor.execute(statement)
+
+	@staticmethod
+	def yieldRankedResults(cursor, statement, rankName = "rank"):
+		"""
+		Yield each result of the given statement ordered by the value stored in
+		the column named rankName
+		"""
+
+		cursor.execute("select * from ({1}) where rank = 1".format(statement))
+
+		result = cursor.fetchone()
+
+		i = 1
+
+		while result is not None:
+
+			yield result
+
+			i += 1
+
+			result = cursor.execute(
+				"select * from ({0}) where rank = {1}".format(statement, i))
+
 class Tweet:
 	"""Represents a tweet"""
 
@@ -125,21 +158,8 @@ class TweetsTableTools:
 			TweetsTableTools._FOLLOWS_TABLE) + \
 			"where flwer = writer and {0} and writer = flwee".format(follower)
 
-		cursor.execute("select {0} from ({1}) where rank = 1".format(
-			columns, rankedSelect))
-
-		result = cursor.fetchone()
-
-		i = 1
-
-		while result is not None:
-
+		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
-
-			i += 1
-
-			cursor.execute("select {0} from ({1}) where rank = {2}".format(
-				columns, rankedSelect, i))
 
 	@staticmethod
 	def getTweetsByDate(cursor, userID):
@@ -158,21 +178,8 @@ class TweetsTableTools:
 		rankedSelect = "select {0}, {1} from {2}".format(columns,
 			rankStatement, TweetsTableTools._TWEETS_TABLE)
 
-		cursor.execute("select {0} from ({1}) where rank = 1".format(
-			columns, rankedSelect))
-
-		result = cursor.fetchone()
-
-		i = 1
-
-		while result is not None:
-
+		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield Tweet(result[0], userID, result[1], result[2], result[3])
-
-			i += 1
-
-			cursor.execute("select {0} from ({1}) where rank = {2}".format(
-				columns, rankedSelect, i))
 
 class FollowsTableTools:
 	"""Tools for working with the 'Follows' table"""
@@ -183,33 +190,74 @@ class FollowsTableTools:
 	def getFollowers(cursor, followee):
 		"""Yield the user ID for each person being following followee"""
 
-		cursor.execute("select flwer from {0} where flwee = '{1}'".format(
-			FollowsTableTools._FOLLOWS_TABLE, followee))
+		statement = "select flwer from {0} where flwee = '{1}'".format(
+			FollowsTableTools._FOLLOWS_TABLE, followee)
 
-		result = cursor.fetchone()
-
-		while result is not None:
-			yield result[1]
-			result = cursor.fetchone()
+		for result in TableTools.yieldResults(cursor, statement):
+			yield result
 
 	@staticmethod
 	def getFollowing(cursor, follower):
 		"""Yield the user ID for each person being followed by follower"""
 
-		cursor.execute("select flwee from {0} where flwer = '{1}'".format(
-			FollowsTableTools._FOLLOWS_TABLE, follower))
+		statement = "select flwee from {0} where flwer = '{1}'".format(
+			FollowsTableTools._FOLLOWS_TABLE, follower)
 
-		result = cursor.fetchone()
-
-		while result is not None:
-			yield result[1]
-			result = cursor.fetchone()
+		for result in TableTools.yieldResults(cursor, statement):
+			yield result
 
 class UsersTableTools:
 	"""Tools for working with the 'Users' table"""
 
 	_USERS_TABLE = "Users"
 	_MAX_PASSWORD_LENGTH = 4
+
+	@staticmethod
+	def findUsers(cursor, keyword):
+		"""
+		Yield each user whose name or city contains the given keyword (yield
+		matching names first and sort by value length)
+		"""
+
+		for user in UsersTableTools.findUsersByName(cursor, keyword):
+			yield user
+
+		for user in UsersTableTools.findUsersByCity(cursor, keyword):
+			yield user
+
+	@staticmethod
+	def findUsersByName(cursor, keyword):
+		"""
+		Yield each user whose name contains the given keyword (sort by name
+		length)
+		"""
+
+		rankStatement = TableTools.rankStatement("max(length(usr))",
+			descending = False)
+
+		rankedSelect = \
+			"select usr, {0} from {1} where name like '%{2}%'".format(
+				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+
+		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+			yield result
+
+	@staticmethod
+	def findUsersByCity(cursor, keyword):
+		"""
+		Yield each user whose city contains the given keyword (sort by city
+		length)
+		"""
+
+		rankStatement = TableTools.rankStatement("max(length(city))",
+			descending = False)
+
+		rankedSelect = \
+			"select city, {0} from {1} where name like '%{2}%'".format(
+				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+
+		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+			yield result
 
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone, userID):
