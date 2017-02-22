@@ -1,3 +1,5 @@
+from IDGenerator import IDGenerator
+
 class Users:
 	"""Get or add users using the 'users' table"""
 
@@ -26,9 +28,9 @@ class Users:
 		username
 		"""
 
-		pass
+		username = IDGenerator.getUniqueInt(cursor, _TABLE_NAME, "usr")
 
-		#cursor.execute(
-		#"insert into ${0} values ($'{1}', $'{2}', ${3}, ${4}, ${5}, ${6})".format(
-		#	Login._TABLE_NAME, username, password, name, email, city,
-		#		timezone))
+		cursor.execute("insert into ${0} values" +
+			"($'{1}', $'{2}', ${3}, ${4}, ${5}, ${6})".format(
+				Login._TABLE_NAME, username, password, name, email, city,
+					timezone))
