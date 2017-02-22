@@ -87,11 +87,11 @@ class TerminalForm:
 
 		while self._results is None:
 			self._show()
-			self._handleKeypresses()
+			self._handleKeypress()
 
 		return self._results
 
-	def _handleKeypresses(self):
+	def _handleKeypress(self):
 		"""Handle keypresses"""
 
 		pressed = KeypressDetector.getKey(Constants.SPECIAL_KEYS)
