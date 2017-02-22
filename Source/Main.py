@@ -23,7 +23,7 @@ class Main:
 			Main._showExitMessage()
 			return
 
-		mainMenu = MainMenu(cursor)
+		mainMenu = MainMenu(cursor, user)
 		mainMenu.show()
 
 		Main._showExitMessage()
