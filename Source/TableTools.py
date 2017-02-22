@@ -146,6 +146,19 @@ class FollowsTableTools:
 	_FOLLOWS_TABLE = "Follows"
 
 	@staticmethod
+	def getFollowers(cursor, followee):
+		"""Yield the user ID for each person being following followee"""
+
+		cursor.execute("select flwer from {0} where flwee = '{1}'".format(
+			FollowsTableTools._FOLLOWS_TABLE, followee))
+
+		result = cursor.fetchone()
+
+		while result is not None:
+			yield result[1]
+			result = cursor.fetchone()
+
+	@staticmethod
 	def getFollowing(cursor, follower):
 		"""Yield the user ID for each person being followed by follower"""
 
