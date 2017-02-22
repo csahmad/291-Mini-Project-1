@@ -63,7 +63,7 @@ class LoginMenu:
 		else:
 
 			form = TerminalForm(LoginMenu._FORM_FIELDS)
-			values = signUpForm.showAndGet()
+			values = form.showAndGet()
 
 			# If form submitted, add user to table and return user ID
 			if values.submitted:
