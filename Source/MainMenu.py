@@ -123,7 +123,7 @@ class MainMenu:
 		generator = self._tweetGenerator
 
 		# Get next few tweets and pad with None if not enough tweets left
-		tweets = [next(generator, default = None) for _ in range(amount)]
+		tweets = [next(generator, None) for _ in range(amount)]
 
 		# Remove None values
 		tweets = [tweet for tweet in tweets if tweet is not None]
