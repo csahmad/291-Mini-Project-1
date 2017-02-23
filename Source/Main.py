@@ -24,7 +24,10 @@ class Main:
 			return
 
 		mainMenu = MainMenu(cursor, user)
-		mainMenu.show()
+		result = mainMenu.showAndGet()
+
+		if result == MainMenu.LOGOUT_INDEX:
+			pass
 
 		Main._showExitMessage()
 
