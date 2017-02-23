@@ -64,7 +64,7 @@ class TableTools:
 		the column named rankName
 		"""
 
-		cursor.execute("select * from ({1}) where rank = 1".format(statement))
+		cursor.execute("select * from ({0}) where rank = 1".format(statement))
 
 		result = cursor.fetchone()
 
