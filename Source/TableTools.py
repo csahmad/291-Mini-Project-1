@@ -2,6 +2,37 @@ class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
+	def exists(cursor, tableName, columnValues):
+		"""
+		Return whether the given column values exist in the given table
+
+		Replaces None values with "null"
+		Does not add quotation marks to strings
+
+		Keyword arguments:
+		tableName -- the name of the table to check
+		columnValues -- a dictionary in the format {columnName: value}
+		"""
+
+		whereConditions = []
+
+		for column, value in columnValues.items():
+			if value is None: value = "null"
+			whereConditions.append("{0} = {1}".format(column, value))
+
+		whereString = "where " + " and ".join(whereConditions)
+
+		statement = "select unique * from {0} ".format(
+			tableName) + whereString
+
+		cursor.execute(statement)
+
+		result = cursor.fetchone()
+
+		if result is None: return False
+		return True
+
+	@staticmethod
 	def itemExists(cursor, tableName, item, columnName = None):
 		"""
 		Return whether the given value exists in the given table
@@ -206,7 +237,6 @@ class TweetStats:
 	"""Contains stats for a tweet"""
 
 	def __init__(self, retweetCount, replyCount):
-		"""I"""
 
 		self._retweetCount = retweetCount
 		self._replyCount = replyCount
@@ -236,6 +266,13 @@ class TweetsTableTools:
 	_HASHTAGS_TABLE = "Hashtags"
 	_MENTIONS_TABLE = "Mentions"
 	_RETWEETS_TABLE = "Retweets"
+
+	@staticmethod
+	def retweetedByUser(cursor, tweetID, userID):
+		"""Return whether the given tweet was retweeted by the given user"""
+
+		return TableTools.exists(cursor, TweetsTableTools._RETWEETS_TABLE,
+			{"tid": tweetID, "usr": userID})
 
 	@staticmethod
 	def getTweetStats(cursor, tweetID):
