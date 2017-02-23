@@ -2,8 +2,13 @@ class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
-	def itemExists(cursor, tableName, columnName, item):
-		"""Return whether the given string value exists in the given table"""
+	def itemExists(cursor, tableName, item, columnName = None):
+		"""
+		Return whether the given value exists in the given table
+
+		If no column name given, assume table only has one column
+		Does not add quotation marks if item is a string
+		"""
 
 		cursor.execute(
 			"select unique {1} from {0} where {1} = {2}".format(
@@ -81,6 +86,44 @@ class TableTools:
 			result = cursor.execute(
 				"select * from ({0}) where rank = {1}".format(statement, i))
 
+	@staticmethod
+	def insert(cursor, tableName, values):
+		"""
+		Insert the given values (list) into the given table
+
+		Replaces None with "null"
+		Does not add quotation marks to strings
+		"""
+
+		for i in range(len(values)):
+			if values[i] is None: values[i] = "null"
+			values[i] = str(values[i])
+
+		cursor.execute("insert into {0} values ({1})".format(tableName,
+			", ".join(values)))
+
+	@staticmethod
+	def insertItem(cursor, tableName, value):
+		"""
+		Insert the given value into the given one-column table
+
+		Does not add quotation marks if the given value is a string
+		"""
+
+		cursor.execute("insert into {0} values ({1})".format(tableName, value))
+
+	@staticmethod
+	def insertItemIfNew(cursor, tableName, value):
+		"""
+		Insert the given value into the given one-column table if the item does
+		not yet exist in the table
+
+		Does not add quotation marks if the given value is a string
+		"""
+
+		if not TableTools.itemExists(cursor, tableName, value):
+			TableTools.insertItem(cursor, tableName, value)
+
 class Tweet:
 	"""Represents a tweet"""
 
@@ -134,15 +177,54 @@ class Tweet:
 
 		return self._replyTo
 
+class TweetStats:
+	"""Contains stats for a tweet"""
+
+	def __init__(self, retweetCount, replyCount):
+		"""I"""
+
+		self._retweetCount = retweetCount
+		self._replyCount = replyCount
+
+	def __str__(self):
+
+		return "{0} Retweets | {1} Replies".format(self._retweetCount,
+			self._replyCount)
+
+	@property
+	def retweetCount(self):
+		"""Get the number of retweets"""
+
+		return self._retweetCount
+
+	@property
+	def replyCount(self):
+		"""Get the number of replies"""
+
+		return self._replyCount
+
 class TweetsTableTools:
 	"""Tools for working with the 'Tweets' table"""
 
 	_TWEETS_TABLE = "Tweets"
 	_FOLLOWS_TABLE = "Follows"
+	_HASHTAGS_TABLE = "Hashtags"
+	_MENTIONS_TABLE = "Mentions"
 
 	@staticmethod
-	def addTweet(cursor, writer, date, text, tweetID, replyTo = None):
-		"""Add the given tweet to the 'Tweets' table"""
+	def getTweetStats(cursor, tweetID):
+		"""I"""
+
+		pass
+
+	@staticmethod
+	def addTweet(cursor, writer, date, text, tweetID, replyTo = None,
+		hashtags = None):
+		"""
+		Add the given tweet to the 'Tweets' table
+
+		The given hashtags should not contain the "#" at the beginning
+		"""
 
 		# Add quotation marks to text
 		text = TableTools.addQuotes(text)
@@ -153,10 +235,18 @@ class TweetsTableTools:
 		text = TableTools.replaceWithNull(text)
 		replyTo = TableTools.replaceWithNull(replyTo)
 
-		cursor.execute(
-			"insert into {0} values ({1}, {2}, {3}, {4}, {5})".format(
-				TweetsTableTools._TWEETS_TABLE, tweetID, writer, date, text,
-				replyTo))
+		TableTools.insert(TweetsTableTools._TWEETS_TABLE, [tweetID, writer,
+			date, text, replyTo])
+
+		for hashtag in hashtags:
+
+			hashtag = "'{0}'".format(hashtag)
+
+			TableTools.insertItemIfNew(cursor,
+				TweetsTableTools._HASHTAGS_TABLE, hashtag)
+
+			TableTools.insert(cursor,
+				TweetsTableTools._MENTIONS_TABLE, tweetID, hashtag)
 
 	@staticmethod
 	def getFolloweeTweetsByDate(cursor, follower):
@@ -297,19 +387,15 @@ class UsersTableTools:
 		city = TableTools.replaceWithNull(city)
 		timezone = TableTools.replaceWithNull(timezone)
 
-		insertStatement = "insert into {0} values ".format(
-			UsersTableTools._USERS_TABLE) + \
-			"({0}, {1}, {2}, {3}, {4}, {5})".format(
-			userID, password, name, email, city, timezone)
-
-		cursor.execute(insertStatement)
+		TableTools.insert(UsersTableTools._USERS_TABLE, [userID, password,
+			name, email, city, timezone])
 
 	@staticmethod
 	def userExists(cursor, userID):
 		"""Return whether the user exists"""
 
 		return TableTools.itemExists(cursor, UsersTableTools._USERS_TABLE,
-			"usr", userID)
+			userID, "usr")
 
 	@staticmethod
 	def loginExists(cursor, userID, password):
