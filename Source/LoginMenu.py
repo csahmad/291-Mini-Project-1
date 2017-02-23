@@ -10,7 +10,7 @@ class LoginMenu:
 	_SIGN_IN_INDEX = 0
 	_SIGN_UP_INDEX = 1
 
-	_MENU_OPTIONS = ("Sign in", "Sign up")
+	_MENU_OPTIONS = ("Sign in", "Sign up", "Exit")
 
 	_FORM_FIELDS = [FormField("Password", 4), FormField("Name", 20),
 		FormField("Email", 15), FormField("City", 12),
@@ -60,7 +60,7 @@ class LoginMenu:
 			return userID
 
 		# If "Sign up" chosen
-		else:
+		elif choice == LoginMenu._SIGN_UP_INDEX:
 
 			form = TerminalForm(LoginMenu._FORM_FIELDS)
 			result = form.showAndGet()
@@ -84,6 +84,10 @@ class LoginMenu:
 			# If the cancel option was chosen, go to main login/sign up menu
 			else:
 				return LoginMenu._showAndGet(cursor, True)
+
+		# If "Exit" chosen
+		else:
+			return None
 
 	@staticmethod
 	def _login(cursor):
