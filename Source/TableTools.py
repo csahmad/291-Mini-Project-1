@@ -43,7 +43,7 @@ class TableTools:
 		else:
 			order = "asc"
 
-		return "rank() over(order by {0}) {1}) {2}".format(over, order,
+		return "rank() over(order by {0} {1}) {2}".format(over, order,
 			statementName)
 
 	@staticmethod
@@ -63,6 +63,8 @@ class TableTools:
 		Yield each result of the given statement ordered by the value stored in
 		the column named rankName
 		"""
+
+		print("select * from ({0}) where rank = 1".format(statement) + "\n\n")
 
 		cursor.execute("select * from ({0}) where rank = 1".format(statement))
 
@@ -175,7 +177,7 @@ class TweetsTableTools:
 		rankedSelect = "select {0}, {1} from {2}, {3} ".format(
 			columns, rankStatement, TweetsTableTools._TWEETS_TABLE,
 			TweetsTableTools._FOLLOWS_TABLE) + \
-			"where flwer = writer and {0} and writer = flwee".format(follower)
+			"where flwer = {0} and writer = flwee".format(follower)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
