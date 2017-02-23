@@ -1,7 +1,7 @@
 class ViewTweetMenu:
 	"""I"""
 
-	def __init__(cursor, userID):
+	def __init__(cursor, userID, tweet):
 
 		self._userID = userID
 

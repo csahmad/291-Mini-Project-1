@@ -81,7 +81,8 @@ class MainMenu:
 
 		# If a tweet was chosen
 		else:
-			viewTweetMenu = ViewTweetMenu(cursor, self._userID)
+			viewTweetMenu = ViewTweetMenu(cursor, self._userID,
+				self._displayedTweets[choice])
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
 
