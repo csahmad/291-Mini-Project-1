@@ -9,7 +9,7 @@ class Main:
 	_EXIT_MESSAGE = "Bye"
 
 	@staticmethod
-	def main():
+	def main(commitChanges = False):
 		"""Run the program"""
 
 		# Get connection to database and cursor
@@ -18,8 +18,9 @@ class Main:
 
 		Main._loginAndRun(cursor)        # Run
 
-		# Exit
+		# Commit and exit
 		Main._showExitMessage()
+		if commitChanges: connection.commit()
 		connection.close()
 
 	@staticmethod
