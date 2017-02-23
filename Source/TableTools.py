@@ -87,6 +87,31 @@ class TableTools:
 				"select * from ({0}) where rank = {1}".format(statement, i))
 
 	@staticmethod
+	def getCount(cursor, tableName, condition = None, unique = False):
+		"""
+		Return the number of rows in the given table that match the given
+		condition
+
+		Return the total number of rows if no condition given
+		Do not include the "where" keyword in condition
+		"""
+
+		if unique:
+			start = "select unique count(*) from {0}".format(tableName)
+
+		else:
+			start = "select count(*) from {0}".format(tableName)
+
+		if condition is None:
+			end = ""
+
+		else:
+			end = " where {0}".format(condition)
+
+		cursor.execute(start + end)
+		return cursor.fetchone()[0]
+
+	@staticmethod
 	def insert(cursor, tableName, values):
 		"""
 		Insert the given values (list) into the given table
@@ -204,18 +229,34 @@ class TweetStats:
 		return self._replyCount
 
 class TweetsTableTools:
-	"""Tools for working with the 'Tweets' table"""
+	"""Tools for working with tweets"""
 
 	_TWEETS_TABLE = "Tweets"
 	_FOLLOWS_TABLE = "Follows"
 	_HASHTAGS_TABLE = "Hashtags"
 	_MENTIONS_TABLE = "Mentions"
+	_RETWEETS_TABLE = "Retweets"
 
 	@staticmethod
 	def getTweetStats(cursor, tweetID):
-		"""I"""
+		"""Return a TweetStats object for the tweet with the given ID"""
 
-		pass
+		return TweetStats(TweetsTableTools.getRetweetCount,
+			TweetsTableTools.getReplyCount(cursor, tweetID))
+
+	@staticmethod
+	def getRetweetCount(cursor, tweetID):
+		"""Return the number of retweets the tweet with the given ID has"""
+
+		return TableTools.getCount(cursor, TweetsTableTools._RETWEETS_TABLE,
+			"tid = {0}".format(tweetID))
+
+	@staticmethod
+	def getReplyCount(cursor, tweetID):
+		"""Return the number of replies to the tweet with the given ID"""
+
+		return TableTools.getCount(cursor, TweetsTableTools._TWEETS_TABLE,
+			"replyto = {0}".format(tweetID))
 
 	@staticmethod
 	def addTweet(cursor, writer, date, text, tweetID, replyTo = None,
