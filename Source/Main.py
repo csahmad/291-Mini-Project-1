@@ -16,22 +16,29 @@ class Main:
 		connection = OracleTerminalConnection.connect()
 		cursor = connection.cursor()
 
+		Main._loginAndRun(cursor)        # Run
+
+		# Exit
+		Main._showExitMessage()
+		connection.close()
+
+	@staticmethod
+	def _loginAndRun(cursor):
+		"""Let the user login/sign up and run the main menu"""
+
 		user = LoginMenu.getUser(cursor)
 
-		# If an exit key was pressed, show exit message and exit
-		if user is None:
-			Main._showExitMessage()
-			return
+		# If an exit key was pressed, return
+		if user is None: return
 
+		# Run the main menu
 		mainMenu = MainMenu(cursor, user)
 		result = mainMenu.showAndGet()
 
+		# If the user signed out, let the user sign in again or sign up, then
+		# run the main menu again
 		if result == MainMenu.LOGOUT_INDEX:
-			pass
-
-		Main._showExitMessage()
-
-		connection.close()
+			Main._loginAndRun(cursor)
 
 	@staticmethod
 	def _showExitMessage():
