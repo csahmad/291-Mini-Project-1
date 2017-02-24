@@ -1,4 +1,5 @@
 from TweetTools import Tweet, TweetStats
+from UserTools import UserStats
 
 class TableTools:
 	"""Static methods for getting information about tables"""
@@ -217,7 +218,7 @@ class TweetsTableTools:
 	def getTweetStats(cursor, tweetID):
 		"""Return a TweetStats object for the tweet with the given ID"""
 
-		return TweetStats(TweetsTableTools.getRetweetCount,
+		return TweetStats(TweetsTableTools.getRetweetCount(cursor, tweetID),
 			TweetsTableTools.getReplyCount(cursor, tweetID))
 
 	@staticmethod
@@ -335,10 +336,40 @@ class FollowsTableTools:
 			yield result
 
 class UsersTableTools:
-	"""Tools for working with the 'Users' table"""
+	"""Tools for working with users"""
 
 	_USERS_TABLE = "Users"
-	_MAX_PASSWORD_LENGTH = 4
+	_FOLLOWS_TABLE = "Follows"
+	_TWEETS_TABLE = "Tweets"
+
+	@staticmethod
+	def getUserStats(cursor, userID):
+		"""Return a UserStats object for the user with the given ID"""
+
+		return UserStats(UsersTableTools.getTweetCount(cursor, userID),
+			UsersTableTools.getFollowingCount(cursor, userID),
+			UsersTableTools.getFollowerCount(cursor, userID))
+
+	@staticmethod
+	def getTweetCount(cursor, userID):
+		"""Return the number of tweets from the given user"""
+
+		return getCount(cursor, UsersTableTools._TWEETS_TABLE,
+			"writer = {0}".format(userID))
+
+	@staticmethod
+	def getFollowingCount(cursor, userID):
+		"""Return the number of people this user is following"""
+
+		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+			"flwer = {0}".format(userID))
+
+	@staticmethod
+	def getFollowerCount(cursor, userID):
+		"""Return the number of people following this user"""
+
+		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+			"flwee = {0}".format(userID))
 
 	@staticmethod
 	def findUsers(cursor, keyword):
@@ -433,8 +464,6 @@ class UsersTableTools:
 	@staticmethod
 	def loginExists(cursor, userID, password):
 		"""Return whether the given username, password combination exists"""
-
-		if len(password) > UsersTableTools._MAX_PASSWORD_LENGTH: return False
 
 		cursor.execute(
 		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
