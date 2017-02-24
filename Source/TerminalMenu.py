@@ -1,6 +1,149 @@
 from Constants import Constants
 from TerminalInterface import TerminalInterface
 from KeypressDetector import KeypressDetector
+from GeneratorTools import GeneratorTools
+
+class GeneratorMenuChoice:
+	"""Represents a user choice from a TerminalGeneratorMenu"""
+
+	def __init__(self, chosenItem = None, chosenOptionIndex = None):
+		"""
+		Arguments:
+		chosenItem -- the item that was chosen (if any)
+		chosenOptionIndex -- the index of the non-generator-item option that
+			was chosen (if any)
+		"""
+
+		self._chosenItem = chosenItem
+		self._chosenOptionIndex = chosenOptionIndex
+
+	@property
+	def chosenItem(self):
+
+		return chosenItem
+
+	@property
+	def chosenOptionIndex(self):
+
+		return chosenOptionIndex
+
+	def itemWasChosen(self):
+		"""Return whether an item was chosen"""
+
+		return self._chosenItem != None
+
+class TerminalGeneratorMenu:
+	"""
+	A menu that displays a few options at a time with a "See more" option
+
+	Gets options using a given generator
+	"""
+
+	_SEE_MORE_INDEX = 0
+	_SEE_MORE_STRING = "See more"
+
+	def __init__(self, generator, pageSize = 5, otherOptions = None,
+		preMessage = None, postMessage = None):
+		"""
+		Arguments:
+		generator -- the generator to get the options from
+		pageSize -- the number of items to show per page
+		otherOptions -- any options to show below the options from the
+			generator
+		preMessage -- the message to show above the menu
+		postMessage -- the message to show below the menu
+		"""
+
+		self._generator = generator
+		self._pageSize = pageSize
+		if otherOptions is None: otherOptions = []
+		self._otherOptions = otherOptions
+		self._preMessage = preMessage
+		self._postMessage = postMessage
+
+		self._displayedItems = None
+		self._displayedItemStrings = None
+		self._exhaustedItems = False
+
+	def showAndGet(self):
+		"""
+		Show the menu and return a GeneratorMenuChoice or None (if an exit key
+		was pressed)
+		"""
+
+		choice = TerminalGeneratorMenu._SEE_MORE_INDEX
+
+		while choice == TerminalGeneratorMenu._SEE_MORE_INDEX:
+			self._getNextItems()
+			choice = self._showAndGet()
+
+		return choice
+
+	def _showAndGet(self):
+		"""
+		Show the menu and return a GeneratorMenuChoice or None (if an exit key
+		was pressed)
+		"""
+
+		options = list(self._displayedItemStrings)
+
+		if not self._exhaustedItems:
+			options += [TerminalGeneratorMenu._SEE_MORE_STRING]
+
+		options += self._otherOptions
+
+		menu = TerminalMenu(options, self._preMessage, self._postMessage)
+
+		return self._choiceFromIndex(menu.showAndGet())
+
+	def _choiceFromIndex(self, index):
+		"""
+		Convert the given choice from an index into a GeneratorMenuChoice or
+		return TerminalGeneratorMenu._SEE_MORE_INDEX if the user chose to see
+		more
+
+		Return None if None given
+		"""
+
+		if index is None: return None
+
+		count = len(self._displayedItems)
+
+		# If an item was chosen, return a GeneratorMenuChoice
+		if index < count:
+			return GeneratorMenuChoice(self._displayedItems[index])
+
+		optionIndex = count - index
+
+		# If the user chose to see more, return
+		# TerminalGeneratorMenu._SEE_MORE_INDEX
+		if not self._exhaustedItems and \
+			optionIndex == TerminalGeneratorMenu._SEE_MORE_INDEX:
+
+			return TerminalGeneratorMenu._SEE_MORE_INDEX
+
+		# If another option was chosen, return a GeneratorMenuChoice
+		return GeneratorMenuChoice(chosenOptionIndex = optionIndex)
+
+	def _getNextItems(self):
+		"""
+		Store the next few items or set self._exhaustedItems to True (if no
+		more)
+		"""
+
+		items = GeneratorTools.next(self._generator, self._pageSize)
+		count = len(items)
+
+		if count == 0:
+			self._exhaustedItems = True
+
+		else:
+
+			if count < self._pageSize:
+				self._exhaustedItems = True
+
+			self._displayedItems = items
+			self._displayedItemStrings = [str(item) for item in items]
 
 class TerminalMenu:
 	"""A menu (list of options) for a terminal interface"""
@@ -89,7 +232,14 @@ class TerminalMenu:
 # Interactive test
 if __name__ == "__main__":
 
-	options = ("Option 0", "Option 1", "Option 2")
+	def itemGenerator():
 
-	menu = TerminalMenu(options)
+		items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6",
+			"Item 7", "Item 8", "Item 9", "Item 10", "Last Item"]
+
+		for item in items: yield item
+
+	generator = itemGenerator()
+	options = ["Option 1", "Option 2"]
+	menu = TerminalGeneratorMenu(generator)
 	print(menu.showAndGet())
