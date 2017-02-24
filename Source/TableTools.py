@@ -317,7 +317,7 @@ class FollowsTableTools:
 
 	@staticmethod
 	def getFollowers(cursor, followee):
-		"""Yield the user ID for each person being following followee"""
+		"""Yield the user ID for each person following followee"""
 
 		statement = "select flwer from {0} where flwee = '{1}'".format(
 			FollowsTableTools._FOLLOWS_TABLE, followee)
