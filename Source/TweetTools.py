@@ -30,7 +30,7 @@ class Tweet:
 			replyToString = ""
 
 		else:
-			replyToString = "@{0} ".format(replyTo)
+			replyToString = "@{0} ".format(self._replyTo)
 
 		return "{0}: {1}{2} ({3})".format(self._writer, replyToString,
 			self._text, self._date)
