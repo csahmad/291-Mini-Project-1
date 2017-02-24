@@ -7,7 +7,7 @@ class FollowersMenu:
 	BACK_INDEX = 0
 	_EMPTY_MESSAGE = "No followers"
 
-	def __init__(cursor, userID):
+	def __init__(self, cursor, userID):
 
 		self._cursor = cursor
 		self._userID = userID
