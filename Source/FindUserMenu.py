@@ -1,10 +1,13 @@
 from TableTools import UsersTableTools
-from GeneratorTools import GeneratorTools
+from TerminalMenu import TerminalGeneratorMenu
 
 class FindUserMenu:
 	"""Interface for searching for a user"""
 
-	NOT_EXIT = 1
+	BACK_INDEX = 0
+	_INITIAL_INDEX = -1
+
+	_EMPTY_MESSAGE = "No matches"
 
 	def __init__(self, cursor, userID):
 		"""
@@ -15,40 +18,47 @@ class FindUserMenu:
 		self._cursor = cursor
 		self._userID = userID
 		self._resultsGenerator = None
-		self._displayedUsers = None
 
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		FindUserMenu.NOT_EXIT
+		FindUserMenu.BACK_INDEX
 		"""
 
 		keyword = input("Enter keyword:")
-
 		self._resultsGenerator = UsersTableTools.findUsers(self._cursor,
 			keyword)
 
-		self._getNextUsers()
-		if self._displayedUsers is None: self._displayedUsers = []
+		choice = FindUserMenu._INITIAL_INDEX
 
-		self._showAndGet()
+		while choice is not None and choice != FindUserMenu.BACK_INDEX:
+			choice = self._showAndGet()
+
+		return choice
 
 	def _showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		FindUserMenu.NOT_EXIT
+		FindUserMenu.BACK_INDEX
 		"""
 
-		pass
+		menu = TerminalGeneratorMenu(self._resultsGenerator,
+			emptyMessage = FindUserMenu._EMPTY_MESSAGE)
 
-	def _getNextUsers(self, amount = 5):
-		"""Store the next few users or None if no more"""
+		result = menu.showAndGet()
 
-		self._displayedUsers = GeneratorTools.next(self._resultsGenerator,
-			amount)
+		# If an exit key was pressed, return None
+		if result is None: return None
 
-		if len(self._displayedUsers) == 0:
-			self._displayedUsers = None
+		# If the back option was chosen, return FindUserMenu.BACK_INDEX
+		if result.backWasChosen: return FindUserMenu.BACK_INDEX
+
+		# If a user was chosen, view the user
+		else:
+			viewUserMenu = ViewUserMenu(cursor, self._userID,
+				result.chosenItem)
+			result = viewUserMenu.showAndGet()
+			if result is None: return None        # If an exit key was pressed
 
 # Interactive test
 if __name__ == "__main__":

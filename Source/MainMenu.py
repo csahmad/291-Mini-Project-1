@@ -1,4 +1,3 @@
-from GeneratorTools import GeneratorTools
 from DateTools import DateTools
 from IDGenerator import IDGenerator
 from TerminalMenu import TerminalGeneratorMenu

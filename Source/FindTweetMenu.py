@@ -1,12 +1,15 @@
 import re
 
-from GeneratorTools import GeneratorTools
 from TableTools import TweetsTableTools
+from TerminalMenu import TerminalGeneratorMenu
 
 class FindTweetMenu:
 	"""Interface for searching for a tweet"""
 
-	NOT_EXIT = 1
+	BACK_INDEX = 0
+	_INITIAL_INDEX = -1
+
+	_EMPTY_MESSAGE = "No matches"
 
 	def __init__(self, cursor, userID):
 		"""
@@ -16,41 +19,48 @@ class FindTweetMenu:
 
 		self._cursor = cursor
 		self._userID = userID
-		self._tweetGenerator = None
-		self._displayedTweets = None
+		self._resultsGenerator = None
 
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		FindTweetMenu.NOT_EXIT
+		FindTweetMenu.BACK_INDEX
 		"""
 
 		keywords = input("Enter keywords:")
+		self._resultsGenerator = TweetsTableTools.findTweets(self._cursor,
+			re.split("\s|\s*,\s*", keywords))
 
-		self._tweetGenerator = TweetsTableTools.findTweets(self._cursor,
-			re.split("\s", keywords))
+		choice = FindTweetMenu._INITIAL_INDEX
 
-		self._getNextTweets()
-		if self._displayedTweets is None: self._displayedTweets = []
+		while choice is not None and choice != FindTweetMenu.BACK_INDEX:
+			choice = self._showAndGet()
 
-		self._showAndGet()
+		return choice
 
 	def _showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		FindUserMenu.NOT_EXIT
+		FindTweetMenu.BACK_INDEX
 		"""
 
-		pass
+		menu = TerminalGeneratorMenu(self._resultsGenerator,
+			emptyMessage = FindTweetMenu._EMPTY_MESSAGE)
 
-	def _getNextTweets(self, amount = 5):
-		"""Store the next few tweets or None if no more"""
+		result = menu.showAndGet()
 
-		self._displayedTweets = GeneratorTools.next(self._tweetGenerator,
-			amount)
+		# If an exit key was pressed, return None
+		if result is None: return None
 
-		if len(self._displayedTweets) == 0:
-			self._displayedTweets = None
+		# If the back option was chosen, return FindTweetMenu.BACK_INDEX
+		if result.backWasChosen: return FindTweetMenu.BACK_INDEX
+
+		# If a tweet was chosen, view the tweet
+		else:
+			viewTweetMenu = ViewTweetMenu(cursor, self._userID,
+				result.chosenItem)
+			result = viewTweetMenu.showAndGet()
+			if result is None: return None        # If an exit key was pressed
 
 # Interactive test
 if __name__ == "__main__":
