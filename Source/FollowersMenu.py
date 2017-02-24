@@ -1,5 +1,5 @@
 class FollowersMenu:
-	"""I"""
+	"""A menu for viewing the followers of a user"""
 
 	def __init__(cursor, userID):
 

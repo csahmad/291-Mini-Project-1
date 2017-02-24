@@ -278,7 +278,7 @@ class TweetsTableTools:
 	@staticmethod
 	def findTweets(cursor, keywords):
 		"""
-		Find tweets that contain the given keywords
+		Find tweets that contain any of the given keywords
 
 		If a keyword starts with "#", interpret as hashtag
 		"""
@@ -440,39 +440,47 @@ class UsersTableTools:
 			yield user
 
 	@staticmethod
-	def findUsersByName(cursor, keyword):
+	def findUsersByName(cursor, keywords):
 		"""
-		Yield each user whose name contains the given keyword (sort by name
-		length)
+		Yield each user whose name contains any of the given keywords (sort by
+		name length)
 		"""
 
-		keyword = keyword.lower()
+		# Make keywords lowercase and surround each with "%"s and "'"s
+		keywords = ["'%{0}%'".format(keyword.lower())
+			for keyword in keywords]
 
 		rankStatement = TableTools.rankStatement("length(usr)",
 			descending = False)
 
 		rankedSelect = \
-			"select usr, {0} from {1} where lower(name) like '%{2}%'".format(
-				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+			"select usr, {0} from {1} where lower(name) like any({2})".format(
+				rankStatement, UsersTableTools._USERS_TABLE,
+				", ".join(keywords))
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield result
 
 	@staticmethod
-	def _usersByCityNotName(cursor, keyword):
+	def _usersByCityNotName(cursor, keywords):
 		"""
-		Yield each user whose city contains the given keyword, but whose name
-		does not contain the given keyword (sort by city length)
+		Yield each user whose city contains any of the given keywords, but
+		whose name does not contain any of the given keyword (sort by city
+		length)
 		"""
 
-		keyword = keyword.lower()
+		# Make keywords lowercase and surround each with "%"s and "'"s
+		keywords = ["'%{0}%'".format(keyword.lower())
+			for keyword in keywords]
+
+		anyString = "any({0})".format(", ".join(keywords))
 
 		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
 		whereConditions = \
-			"lower(city) like '%{0}%' and lower(name) not like '%{0}%'".format(
-				keyword)
+			"lower(city) like {0} and lower(name) not like {0}".format(
+				anyString)
 
 		rankedSelect = \
 			"select usr, {0} from {1} where ".format(rankStatement,
