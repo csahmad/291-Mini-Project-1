@@ -428,7 +428,7 @@ class UsersTableTools:
 		for user in UsersTableTools.findUsersByName(cursor, keyword):
 			yield user
 
-		for user in UsersTableTools.findUsersByCity(cursor, keyword):
+		for user in UsersTableTools._usersByCityNotName(cursor, keyword):
 			yield user
 
 	@staticmethod
@@ -451,10 +451,10 @@ class UsersTableTools:
 			yield result
 
 	@staticmethod
-	def findUsersByCity(cursor, keyword):
+	def _usersByCityNotName(cursor, keyword):
 		"""
-		Yield each user whose city contains the given keyword (sort by city
-		length)
+		Yield each user whose city contains the given keyword, but whose name
+		does not contain the given keyword (sort by city length)
 		"""
 
 		keyword = keyword.lower()
@@ -462,9 +462,13 @@ class UsersTableTools:
 		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
+		whereConditions = \
+			"lower(city) like '%{0}%' and lower(name) not like '%{0}%'".format(
+				keyword)
+
 		rankedSelect = \
-			"select city, {0} from {1} where lower(name) like '%{2}%'".format(
-				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+			"select usr, {0} from {1} where ".format(rankStatement,
+				UsersTableTools._USERS_TABLE) + whereConditions
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield result
