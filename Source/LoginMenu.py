@@ -31,7 +31,7 @@ class LoginMenu:
 		Show the menu and return the user ID or None (if an exit key is
 		pressed)
 
-		Keyword arguments:
+		Arguments:
 		loginFailed -- whether the user just made a failed login attempt
 		"""
 

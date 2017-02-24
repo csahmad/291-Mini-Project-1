@@ -23,7 +23,7 @@ class KeypressDetector:
         """
         Detect a keypress and return the result
 
-        Keyword arguments:
+        Arguments:
         specialKeys -- keys that are represented by more than one character
             that you would like this method to handle
         """

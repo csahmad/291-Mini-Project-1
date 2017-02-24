@@ -9,7 +9,7 @@ class TableTools:
 		Replaces None values with "null"
 		Does not add quotation marks to strings
 
-		Keyword arguments:
+		Arguments:
 		tableName -- the name of the table to check
 		columnValues -- a dictionary in the format {columnName: value}
 		"""
@@ -351,7 +351,7 @@ class TweetsTableTools:
 
 		Yield as Tweet object
 
-		Keyword arguments:
+		Arguments:
         follower -- the ID of the follower
 		"""
 
@@ -374,7 +374,7 @@ class TweetsTableTools:
 
 		Yield as Tweet object
 
-		Keyword arguments:
+		Arguments:
         userID -- the ID of the writer of the tweets
 		"""
 

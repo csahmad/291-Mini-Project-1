@@ -8,7 +8,7 @@ class TerminalFormResults:
 
 	def __init__(self, fields = None, exitKeyPressed = False):
 		"""
-		Keyword arguments:
+		Arguments:
 		fields -- a collection of Field objects or None (if form not submitted)
 		exitKeyPressed -- whether the user pressed an exit key while in the
 			form (as opposed to just choosing the cancel option)
@@ -52,7 +52,7 @@ class TerminalFormResults:
 
 		If fields is None, return None
 
-		Keyword arguments:
+		Arguments:
 		fields -- the collection of Field objects to extract from
 		"""
 
@@ -67,7 +67,7 @@ class FormField:
 	def __init__(self, name, maxValueLength = None, isNumeric = False,
 		value = ""):
 		"""
-		Keyword arguments:
+		Arguments:
         name -- the name/label of this field
         maxValueLength -- the maximum allowed length of the value for this
         	field (required if not numeric)
@@ -113,7 +113,7 @@ class TerminalForm:
 
 	def __init__(self, fields):
 		"""
-		Keyword arguments:
+		Arguments:
         fields -- the fields for this form as a list/tuple of Field objects
 		"""
 

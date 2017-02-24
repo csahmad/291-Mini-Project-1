@@ -7,7 +7,7 @@ class TerminalMenu:
 
 	def __init__(self, options, preMessage = None, postMessage = None):
 		"""
-		Keyword arguments:
+		Arguments:
 		options -- the options the user can choose from as a collection of
 			strings
 		preMessage -- the message to show above the menu (optional)
