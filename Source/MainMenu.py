@@ -64,7 +64,9 @@ class MainMenu:
 		if result.itemWasChosen():
 			viewTweetMenu = ViewTweetMenu(self._cursor, self._userID,
 				result.chosenItem)
+			print("yay")
 			result = viewTweetMenu.showAndGet()
+			print("damn")
 			if result is None: return None        # If an exit key was pressed
 
 		# If user chose to post a tweet, let the user post a tweet
