@@ -146,7 +146,7 @@ class TerminalGeneratorMenu:
 			return seeMoreIndex
 
 		# If the user chose to go back, return a GeneratorMenuChoice
-		if optionIndex == backIndex
+		if optionIndex == backIndex:
 			return GeneratorMenuChoice(backWasChosen = True)
 
 		# If another option was chosen, return a GeneratorMenuChoice
