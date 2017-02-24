@@ -1,10 +1,13 @@
+import time
+
 from TableTools import TweetsTableTools
 from TerminalMenu import TerminalMenu
+from IDGenerator import IDGenerator
 
 class ViewTweetMenu:
 	"""The menu for viewing a tweet and replying to it or retweeting it"""
 
-	_BACK_INDEX = 0
+	BACK_INDEX = 0
 	_REPLY_INDEX = 1
 	_RETWEET_INDEX = 2
 
@@ -13,8 +16,9 @@ class ViewTweetMenu:
 
 	def __init__(cursor, userID, tweet):
 
+		self._cursor = cursor
 		self._userID = userID
-		self._retweetedByUser = TweetsTableTools.retweetedByUser(cursor,
+		self._isRetweetedByUser = TweetsTableTools.isRetweetedByUser(cursor,
 			tweet.tweetID, userID)
 
 		self._tweet = tweet
@@ -23,14 +27,12 @@ class ViewTweetMenu:
 		self._tweetString = str(tweet) + "\n\t" + str(self._tweetStats)
 
 	def showAndGet(self):
-		"""I"""
+		"""
+		Show the menu and return either ViewTweetMenu.BACK_INDEX (if back
+		option chosen) or None (if an exit key was pressed)
+		"""
 
-		I
-
-	def _showAndGet(self):
-		"""I"""
-
-		if self._retweetedByUser:
+		if self._isRetweetedByUser:
 
 			preMessage = self._tweetString + "\n\t" + \
 				"You have retweeted this"
@@ -48,15 +50,50 @@ class ViewTweetMenu:
 		if choice is None: return None
 
 		# If user chose to go back, return choice
-		if choice == ViewTweetMenu._BACK_INDEX:
+		if choice == ViewTweetMenu.BACK_INDEX:
 			return choice
 
 		# If user chose to reply to the tweet, let user write reply
 		if choice == ViewTweetMenu._REPLY_INDEX:
 			replyText = input("Reply:")
 			hashtags = TweetTools.getHashtags(replyText)
-			#TweetsTableTools.addTweet()
+			tweet = self._tweet
+			replyTweetID = IDGenerator.getNewTweetID(self._cursor)
+			replyDate = ViewTweetMenu.getCurrentDate()
+			TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
+				replyText, replyTweetID, tweet.tweetID, hashtags)
+			self._tweetStats.addReply()
+			self._showAndGet()
 
 		# If user chose to retweet the tweet, retweet
 		elif choice == ViewTweetMenu._RETWEET_INDEX:
-			pass
+			retweetDate = ViewTweetMenu.getCurrentDate()
+			tweet = self._tweet
+			TweetsTableTools.retweet(cursor, tweet.tweetID, self._userID,
+				retweetDate)
+			self._isRetweetedByUser = True
+			self._tweetStats.addRetweet()
+			self._showAndGet()
+
+	@staticmethod
+	def getCurrentDate():
+		"""Return the current date"""
+
+		return time.strftime("%d-%b-%y")
+
+# Interactive test
+if __name__ == "__main__":
+
+	from OracleTerminalConnection import OracleTerminalConnection
+	from LoginMenu import LoginMenu
+
+	# Get connection to database and cursor
+	connection = OracleTerminalConnection.connect()
+	cursor = connection.cursor()
+
+	user = LoginMenu.getUser(cursor)
+
+	menu = ViewTweetMenu(cursor, user)
+	print(menu.showAndGet())
+
+	connection.close()

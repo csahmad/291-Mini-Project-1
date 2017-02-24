@@ -258,6 +258,16 @@ class TweetStats:
 
 		return self._replyCount
 
+	def addRetweet(self):
+		"""Increase retweet count by one"""
+
+		self._retweetCount += 1
+
+	def addReply(self):
+		"""Increase reply count by one"""
+
+		self._replyCount += 1
+
 class TweetsTableTools:
 	"""Tools for working with tweets"""
 
@@ -268,7 +278,14 @@ class TweetsTableTools:
 	_RETWEETS_TABLE = "Retweets"
 
 	@staticmethod
-	def retweetedByUser(cursor, tweetID, userID):
+	def retweet(cursor, tweetID, userID, date):
+		"""Add a retweet to the 'Retweets' table"""
+
+		TableTools.insert(cursor, TweetsTableTools._RETWEETS_TABLE,
+			[userID, tweetID, date])
+
+	@staticmethod
+	def isRetweetedByUser(cursor, tweetID, userID):
 		"""Return whether the given tweet was retweeted by the given user"""
 
 		return TableTools.exists(cursor, TweetsTableTools._RETWEETS_TABLE,
