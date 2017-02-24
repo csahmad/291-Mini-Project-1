@@ -1,4 +1,4 @@
-from UsersTableTools import UsersTableTools
+from TableTools import UsersTableTools
 from GeneratorTools import GeneratorTools
 
 class FindUserMenu:

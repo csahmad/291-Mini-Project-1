@@ -1,7 +1,7 @@
 import re
 
 from GeneratorTools import GeneratorTools
-from TweetsTableTools import TweetsTableTools
+from TableTools import TweetsTableTools
 
 class FindTweetMenu:
 	"""Interface for searching for a tweet"""
