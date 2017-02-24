@@ -13,6 +13,11 @@ class UserStats:
 		self._followingCount = followingCount
 		self._followerCount = followerCount
 
+	def __str__(self):
+
+		return "{0} Tweets | {1} Following | {2} Followers".format(
+			self._tweetCount, self._followingCount, self._followerCount)
+
 	@property
 	def tweetCount(self):
 
