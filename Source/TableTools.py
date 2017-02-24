@@ -278,6 +278,16 @@ class TweetsTableTools:
 	_RETWEETS_TABLE = "Retweets"
 
 	@staticmethod
+	def findTweets(cursor, keywords):
+		"""
+		Find tweets that contain the given keywords
+
+		If a keyword starts with "#", interpret as hashtag
+		"""
+
+		pass
+
+	@staticmethod
 	def retweet(cursor, tweetID, userID, date):
 		"""Add a retweet to the 'Retweets' table"""
 
