@@ -27,3 +27,8 @@ class UserStats:
 	def followerCount(self):
 
 		return self._followerCount
+
+	def follow(self):
+		"""Add 1 to followerCount"""
+
+		self._followerCount += 1
