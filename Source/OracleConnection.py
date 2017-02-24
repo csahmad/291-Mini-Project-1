@@ -13,7 +13,7 @@ class OracleConnection:
 		Does not handle exceptions (this should be done by the terminal
 		interface classes that call this method).
 
-		Keyword arguments:
+		Arguments:
 		username -- your username for the Oracle database
 		password -- your password for the Oracle database
 		connectionString -- the connection string (if None, use settings in

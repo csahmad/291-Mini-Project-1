@@ -1,9 +1,48 @@
+from TweetTools import Tweet, TweetStats
+from UserTools import UserStats
+
 class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
-	def itemExists(cursor, tableName, columnName, item):
-		"""Return whether the given string value exists in the given table"""
+	def exists(cursor, tableName, columnValues):
+		"""
+		Return whether the given column values exist in the given table
+
+		Replaces None values with "null"
+		Does not add quotation marks to strings
+
+		Arguments:
+		tableName -- the name of the table to check
+		columnValues -- a dictionary in the format {columnName: value}
+		"""
+
+		whereConditions = []
+
+		for column, value in columnValues.items():
+			if value is None: value = "null"
+			whereConditions.append("{0} = {1}".format(column, value))
+
+		whereString = "where " + " and ".join(whereConditions)
+
+		statement = "select unique * from {0} ".format(
+			tableName) + whereString
+
+		cursor.execute(statement)
+
+		result = cursor.fetchone()
+
+		if result is None: return False
+		return True
+
+	@staticmethod
+	def itemExists(cursor, tableName, item, columnName = None):
+		"""
+		Return whether the given value exists in the given table
+
+		If no column name given, assume table only has one column
+		Does not add quotation marks if item is a string
+		"""
 
 		cursor.execute(
 			"select unique {1} from {0} where {1} = {2}".format(
@@ -43,7 +82,7 @@ class TableTools:
 		else:
 			order = "asc"
 
-		return "rank() over(order by {0}) {1}) {2}".format(over, order,
+		return "rank() over(order by {0} {1}) {2}".format(over, order,
 			statementName)
 
 	@staticmethod
@@ -55,7 +94,8 @@ class TableTools:
 
 		while result is not None:
 			yield result
-			result = cursor.execute(statement)
+			cursor.execute(statement)
+			result = cursor.fetchone()
 
 	@staticmethod
 	def yieldRankedResults(cursor, statement, rankName = "rank"):
@@ -64,7 +104,7 @@ class TableTools:
 		the column named rankName
 		"""
 
-		cursor.execute("select * from ({1}) where rank = 1".format(statement))
+		cursor.execute("select * from ({0}) where rank = 1".format(statement))
 
 		result = cursor.fetchone()
 
@@ -76,71 +116,136 @@ class TableTools:
 
 			i += 1
 
-			result = cursor.execute(
+			cursor.execute(
 				"select * from ({0}) where rank = {1}".format(statement, i))
 
-class Tweet:
-	"""Represents a tweet"""
+			result = cursor.fetchone()
 
-	def __init__(self, tweetID, writer, date, text, replyTo = None):
+	@staticmethod
+	def getCount(cursor, tableName, condition = None, unique = False):
+		"""
+		Return the number of rows in the given table that match the given
+		condition
 
-		if replyTo == "null": replyTo = None
-		self._tweetID = tweetID
-		self._writer = writer
-		self._date = date
-		self._text = text
-		self._replyTo = replyTo
+		Return the total number of rows if no condition given
+		Do not include the "where" keyword in condition
+		"""
 
-	def __str__(self):
-
-		if self._replyTo is None:
-			replyToString = ""
+		if unique:
+			start = "select unique count(*) from {0}".format(tableName)
 
 		else:
-			replyToString = "@{0} ".format(replyTo)
+			start = "select count(*) from {0}".format(tableName)
 
-		return "{0}: {1}{2} ({3})".format(self._writer, replyToString,
-			self._text, self._date)
+		if condition is None:
+			end = ""
 
-	@property
-	def tweetID(self):
-		"""Return the tweet ID"""
+		else:
+			end = " where {0}".format(condition)
 
-		return self._tweetID
+		cursor.execute(start + end)
+		return cursor.fetchone()[0]
 
-	@property
-	def writer(self):
-		"""Return the writer of the tweet"""
+	@staticmethod
+	def insert(cursor, tableName, values):
+		"""
+		Insert the given values (list) into the given table
 
-		return self._writer
+		Replaces None with "null"
+		Does not add quotation marks to strings
+		"""
 
-	@property
-	def date(self):
-		"""Return the date the tweet was written"""
+		for i in range(len(values)):
+			if values[i] is None: values[i] = "null"
+			values[i] = str(values[i])
 
-		return self._date
+		cursor.execute("insert into {0} values ({1})".format(tableName,
+			", ".join(values)))
 
-	@property
-	def text(self):
-		"""Return the tweet text"""
+	@staticmethod
+	def insertItem(cursor, tableName, value):
+		"""
+		Insert the given value into the given one-column table
 
-		return self._text
+		Does not add quotation marks if the given value is a string
+		"""
 
-	@property
-	def replyTo(self):
-		"""Return the tweet ID this tweet is a reply to or None"""
+		cursor.execute("insert into {0} values ({1})".format(tableName, value))
 
-		return self._replyTo
+	@staticmethod
+	def insertItemIfNew(cursor, tableName, value):
+		"""
+		Insert the given value into the given one-column table if the item does
+		not yet exist in the table
+
+		Does not add quotation marks if the given value is a string
+		"""
+
+		if not TableTools.itemExists(cursor, tableName, value):
+			TableTools.insertItem(cursor, tableName, value)
 
 class TweetsTableTools:
-	"""Tools for working with the 'Tweets' table"""
+	"""Tools for working with tweets"""
 
 	_TWEETS_TABLE = "Tweets"
 	_FOLLOWS_TABLE = "Follows"
+	_HASHTAGS_TABLE = "Hashtags"
+	_MENTIONS_TABLE = "Mentions"
+	_RETWEETS_TABLE = "Retweets"
 
 	@staticmethod
-	def addTweet(cursor, writer, date, text, tweetID, replyTo = None):
-		"""Add the given tweet to the 'Tweets' table"""
+	def findTweets(cursor, keywords):
+		"""
+		Find tweets that contain any of the given keywords
+
+		If a keyword starts with "#", interpret as hashtag
+		"""
+
+		pass
+
+	@staticmethod
+	def retweet(cursor, tweetID, userID, date):
+		"""Add a retweet to the 'Retweets' table"""
+
+		TableTools.insert(cursor, TweetsTableTools._RETWEETS_TABLE,
+			[userID, tweetID, date])
+
+	@staticmethod
+	def isRetweetedByUser(cursor, tweetID, userID):
+		"""Return whether the given tweet was retweeted by the given user"""
+
+		return TableTools.exists(cursor, TweetsTableTools._RETWEETS_TABLE,
+			{"tid": tweetID, "usr": userID})
+
+	@staticmethod
+	def getTweetStats(cursor, tweetID):
+		"""Return a TweetStats object for the tweet with the given ID"""
+
+		return TweetStats(TweetsTableTools.getRetweetCount(cursor, tweetID),
+			TweetsTableTools.getReplyCount(cursor, tweetID))
+
+	@staticmethod
+	def getRetweetCount(cursor, tweetID):
+		"""Return the number of retweets the tweet with the given ID has"""
+
+		return TableTools.getCount(cursor, TweetsTableTools._RETWEETS_TABLE,
+			"tid = {0}".format(tweetID))
+
+	@staticmethod
+	def getReplyCount(cursor, tweetID):
+		"""Return the number of replies to the tweet with the given ID"""
+
+		return TableTools.getCount(cursor, TweetsTableTools._TWEETS_TABLE,
+			"replyto = {0}".format(tweetID))
+
+	@staticmethod
+	def addTweet(cursor, writer, date, text, tweetID, replyTo = None,
+		hashtags = None):
+		"""
+		Add the given tweet to the 'Tweets' table
+
+		The given hashtags should not contain the "#" at the beginning
+		"""
 
 		# Add quotation marks to text
 		text = TableTools.addQuotes(text)
@@ -151,10 +256,18 @@ class TweetsTableTools:
 		text = TableTools.replaceWithNull(text)
 		replyTo = TableTools.replaceWithNull(replyTo)
 
-		cursor.execute(
-			"insert into {0} values ({1}, {2}, {3}, {4}, {5})".format(
-				TweetsTableTools._TWEETS_TABLE, tweetID, writer, date, text,
-				replyTo))
+		TableTools.insert(cursor, TweetsTableTools._TWEETS_TABLE,
+			[tweetID, writer, date, text, replyTo])
+
+		for hashtag in hashtags:
+
+			hashtag = "'{0}'".format(hashtag)
+
+			TableTools.insertItemIfNew(cursor,
+				TweetsTableTools._HASHTAGS_TABLE, hashtag)
+
+			TableTools.insert(cursor,
+				TweetsTableTools._MENTIONS_TABLE, tweetID, hashtag)
 
 	@staticmethod
 	def getFolloweeTweetsByDate(cursor, follower):
@@ -164,7 +277,7 @@ class TweetsTableTools:
 
 		Yield as Tweet object
 
-		Keyword arguments:
+		Arguments:
         follower -- the ID of the follower
 		"""
 
@@ -175,7 +288,7 @@ class TweetsTableTools:
 		rankedSelect = "select {0}, {1} from {2}, {3} ".format(
 			columns, rankStatement, TweetsTableTools._TWEETS_TABLE,
 			TweetsTableTools._FOLLOWS_TABLE) + \
-			"where flwer = writer and {0} and writer = flwee".format(follower)
+			"where flwer = {0} and writer = flwee".format(follower)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
@@ -187,7 +300,7 @@ class TweetsTableTools:
 
 		Yield as Tweet object
 
-		Keyword arguments:
+		Arguments:
         userID -- the ID of the writer of the tweets
 		"""
 
@@ -207,7 +320,7 @@ class FollowsTableTools:
 
 	@staticmethod
 	def getFollowers(cursor, followee):
-		"""Yield the user ID for each person being following followee"""
+		"""Yield the user ID for each person following followee"""
 
 		statement = "select flwer from {0} where flwee = '{1}'".format(
 			FollowsTableTools._FOLLOWS_TABLE, followee)
@@ -225,11 +338,55 @@ class FollowsTableTools:
 		for result in TableTools.yieldResults(cursor, statement):
 			yield result
 
+	@staticmethod
+	def follow(cursor, follower, followee, date):
+		"""Make follower follow followee"""
+
+		TableTools.insert(cursor, FollowsTableTools._FOLLOWS_TABLE,
+			[follower, followee, date])
+
+	@staticmethod
+	def isFollowing(cursor, follower, followee):
+		"""Return whether follower is following followee"""
+
+		return TableTools.exists(cursor, FollowsTableTools._FOLLOWS_TABLE,
+			{"flwer": follower, "flwee": followee})
+
 class UsersTableTools:
-	"""Tools for working with the 'Users' table"""
+	"""Tools for working with users"""
 
 	_USERS_TABLE = "Users"
-	_MAX_PASSWORD_LENGTH = 4
+	_FOLLOWS_TABLE = "Follows"
+	_TWEETS_TABLE = "Tweets"
+
+	@staticmethod
+	def getUserStats(cursor, userID):
+		"""Return a UserStats object for the user with the given ID"""
+
+		return UserStats(UsersTableTools.getTweetCount(cursor, userID),
+			UsersTableTools.getFollowingCount(cursor, userID),
+			UsersTableTools.getFollowerCount(cursor, userID))
+
+	@staticmethod
+	def getTweetCount(cursor, userID):
+		"""Return the number of tweets from the given user"""
+
+		return getCount(cursor, UsersTableTools._TWEETS_TABLE,
+			"writer = {0}".format(userID))
+
+	@staticmethod
+	def getFollowingCount(cursor, userID):
+		"""Return the number of people this user is following"""
+
+		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+			"flwer = {0}".format(userID))
+
+	@staticmethod
+	def getFollowerCount(cursor, userID):
+		"""Return the number of people following this user"""
+
+		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+			"flwee = {0}".format(userID))
 
 	@staticmethod
 	def findUsers(cursor, keyword):
@@ -241,39 +398,48 @@ class UsersTableTools:
 		for user in UsersTableTools.findUsersByName(cursor, keyword):
 			yield user
 
-		for user in UsersTableTools.findUsersByCity(cursor, keyword):
+		for user in UsersTableTools._usersByCityNotName(cursor, keyword):
 			yield user
 
 	@staticmethod
-	def findUsersByName(cursor, keyword):
+	def findUsersByName(cursor, keywords):
 		"""
-		Yield each user whose name contains the given keyword (sort by name
-		length)
+		Yield each user whose name contains any of the given keywords (sort by
+		name length)
 		"""
 
 		rankStatement = TableTools.rankStatement("length(usr)",
 			descending = False)
 
-		rankedSelect = \
-			"select usr, {0} from {1} where name like '%{2}%'".format(
-				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+		like = "regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+
+		rankedSelect = "select usr, {0} from {1} where {2}".format(
+				rankStatement, UsersTableTools._USERS_TABLE, like)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield result
 
 	@staticmethod
-	def findUsersByCity(cursor, keyword):
+	def _usersByCityNotName(cursor, keywords):
 		"""
-		Yield each user whose city contains the given keyword (sort by city
+		Yield each user whose city contains any of the given keywords, but
+		whose name does not contain any of the given keyword (sort by city
 		length)
 		"""
 
 		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
+		cityLike = "regexp_like (city, '{0}', 'i')".format("|".join(keywords))
+
+		nameNotLike = \
+			"not regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+
+		whereConditions = "{0} and {1}".format(cityLike, nameNotLike)
+
 		rankedSelect = \
-			"select city, {0} from {1} where name like '%{2}%'".format(
-				rankStatement, UsersTableTools._USERS_TABLE, keyword)
+			"select usr, {0} from {1} where ".format(rankStatement,
+				UsersTableTools._USERS_TABLE) + whereConditions
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield result
@@ -295,25 +461,19 @@ class UsersTableTools:
 		city = TableTools.replaceWithNull(city)
 		timezone = TableTools.replaceWithNull(timezone)
 
-		insertStatement = "insert into {0} values ".format(
-			UsersTableTools._USERS_TABLE) + \
-			"({0}, {1}, {2}, {3}, {4}, {5})".format(
-			userID, password, name, email, city, timezone)
-
-		cursor.execute(insertStatement)
+		TableTools.insert(cursor, UsersTableTools._USERS_TABLE,
+			[userID, password, name, email, city, timezone])
 
 	@staticmethod
 	def userExists(cursor, userID):
 		"""Return whether the user exists"""
 
 		return TableTools.itemExists(cursor, UsersTableTools._USERS_TABLE,
-			"usr", userID)
+			userID, "usr")
 
 	@staticmethod
 	def loginExists(cursor, userID, password):
 		"""Return whether the given username, password combination exists"""
-
-		if len(password) > UsersTableTools._MAX_PASSWORD_LENGTH: return False
 
 		cursor.execute(
 		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(

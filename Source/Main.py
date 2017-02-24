@@ -9,26 +9,37 @@ class Main:
 	_EXIT_MESSAGE = "Bye"
 
 	@staticmethod
-	def main():
+	def main(commitChanges = False):
 		"""Run the program"""
 
 		# Get connection to database and cursor
 		connection = OracleTerminalConnection.connect()
 		cursor = connection.cursor()
 
+		Main._loginAndRun(cursor)        # Run
+
+		# Commit and exit
+		Main._showExitMessage()
+		if commitChanges: connection.commit()
+		connection.close()
+
+	@staticmethod
+	def _loginAndRun(cursor):
+		"""Let the user login/sign up and run the main menu"""
+
 		user = LoginMenu.getUser(cursor)
 
-		# If an exit key was pressed, show exit message and exit
-		if user is None:
-			Main._showExitMessage()
-			return
+		# If an exit key was pressed, return
+		if user is None: return
 
+		# Run the main menu
 		mainMenu = MainMenu(cursor, user)
-		mainMenu.show()
+		result = mainMenu.showAndGet()
 
-		Main._showExitMessage()
-
-		connection.close()
+		# If the user signed out, let the user sign in again or sign up, then
+		# run the main menu again
+		if result == MainMenu.LOGOUT_INDEX:
+			Main._loginAndRun(cursor)
 
 	@staticmethod
 	def _showExitMessage():

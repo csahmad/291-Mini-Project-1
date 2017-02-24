@@ -10,10 +10,10 @@ class LoginMenu:
 	_SIGN_IN_INDEX = 0
 	_SIGN_UP_INDEX = 1
 
-	_MENU_OPTIONS = ("Sign in", "Sign up")
+	_MENU_OPTIONS = ("Sign in", "Sign up", "Exit")
 
-	_FORM_FIELDS = [FormField("Password", 4), FormField("Name", 20),
-		FormField("Email", 15), FormField("City", 12),
+	_FORM_FIELDS = [FormField("*Password", 4, isRequired = True),
+		FormField("Name", 20), FormField("Email", 15), FormField("City", 12),
 		FormField("Timezone", isNumeric = True)]
 
 	@staticmethod
@@ -31,7 +31,7 @@ class LoginMenu:
 		Show the menu and return the user ID or None (if an exit key is
 		pressed)
 
-		Keyword arguments:
+		Arguments:
 		loginFailed -- whether the user just made a failed login attempt
 		"""
 
@@ -60,7 +60,7 @@ class LoginMenu:
 			return userID
 
 		# If "Sign up" chosen
-		else:
+		elif choice == LoginMenu._SIGN_UP_INDEX:
 
 			form = TerminalForm(LoginMenu._FORM_FIELDS)
 			result = form.showAndGet()
@@ -71,7 +71,7 @@ class LoginMenu:
 				userID = IDGenerator.getNewUserID(cursor)
 				values = result.values
 
-				UsersTableTools.addUser(cursor, values["Password"],
+				UsersTableTools.addUser(cursor, values["*Password"],
 					values["Name"], values["Email"], values["City"],
 					values["Timezone"], userID)
 
@@ -84,6 +84,10 @@ class LoginMenu:
 			# If the cancel option was chosen, go to main login/sign up menu
 			else:
 				return LoginMenu._showAndGet(cursor, True)
+
+		# If "Exit" chosen
+		else:
+			return None
 
 	@staticmethod
 	def _login(cursor):

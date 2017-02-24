@@ -14,7 +14,7 @@ class TerminalInterface:
 		Prompt a user to login and return the entered username and password as
 		a tuple (username first)
 
-		Keyword arguments:
+		Arguments:
 		usernamePrompt -- the prompt to show when asking for the username
 		passwordPrompt -- the prompt to show when asking for the password
 		integerUsername -- whether to only allow an integer username
