@@ -7,7 +7,7 @@ class SearchMenu:
 	_FIND_USER_INDEX = 1
 	BACK_INDEX = 2
 
-	def __init__(cursor, userID):
+	def __init__(self, cursor, userID):
 
 		self._userID = userID
 
