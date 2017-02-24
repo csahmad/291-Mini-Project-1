@@ -62,7 +62,6 @@ class ViewTweetMenu:
 			TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
 				replyText, replyTweetID, tweet.tweetID, hashtags)
 			self._tweetStats.addReply()
-			self._showAndGet()
 
 		# If user chose to retweet the tweet, retweet
 		elif choice == ViewTweetMenu._RETWEET_INDEX:
@@ -72,4 +71,5 @@ class ViewTweetMenu:
 				retweetDate)
 			self._isRetweetedByUser = True
 			self._tweetStats.addRetweet()
-			self._showAndGet()
+
+		return self.showAndGet()
