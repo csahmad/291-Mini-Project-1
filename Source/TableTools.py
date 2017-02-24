@@ -94,7 +94,8 @@ class TableTools:
 
 		while result is not None:
 			yield result
-			result = cursor.execute(statement)
+			cursor.execute(statement)
+			result = cursor.fetchone()
 
 	@staticmethod
 	def yieldRankedResults(cursor, statement, rankName = "rank"):
@@ -115,8 +116,10 @@ class TableTools:
 
 			i += 1
 
-			result = cursor.execute(
+			cursor.execute(
 				"select * from ({0}) where rank = {1}".format(statement, i))
+
+			result = cursor.fetchone()
 
 	@staticmethod
 	def getCount(cursor, tableName, condition = None, unique = False):
