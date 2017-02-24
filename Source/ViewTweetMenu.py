@@ -1,8 +1,7 @@
-import time
-
 from TableTools import TweetsTableTools
 from TerminalMenu import TerminalMenu
 from IDGenerator import IDGenerator
+from DateTools import DateTools
 
 class ViewTweetMenu:
 	"""The menu for viewing a tweet and replying to it or retweeting it"""
@@ -59,7 +58,7 @@ class ViewTweetMenu:
 			hashtags = TweetTools.getHashtags(replyText)
 			tweet = self._tweet
 			replyTweetID = IDGenerator.getNewTweetID(self._cursor)
-			replyDate = ViewTweetMenu.getCurrentDate()
+			replyDate = DateTools.getCurrentDate()
 			TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
 				replyText, replyTweetID, tweet.tweetID, hashtags)
 			self._tweetStats.addReply()
@@ -67,33 +66,10 @@ class ViewTweetMenu:
 
 		# If user chose to retweet the tweet, retweet
 		elif choice == ViewTweetMenu._RETWEET_INDEX:
-			retweetDate = ViewTweetMenu.getCurrentDate()
+			retweetDate = DateTools.getCurrentDate()
 			tweet = self._tweet
 			TweetsTableTools.retweet(cursor, tweet.tweetID, self._userID,
 				retweetDate)
 			self._isRetweetedByUser = True
 			self._tweetStats.addRetweet()
 			self._showAndGet()
-
-	@staticmethod
-	def getCurrentDate():
-		"""Return the current date"""
-
-		return time.strftime("%d-%b-%y")
-
-# Interactive test
-if __name__ == "__main__":
-
-	from OracleTerminalConnection import OracleTerminalConnection
-	from LoginMenu import LoginMenu
-
-	# Get connection to database and cursor
-	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
-
-	user = LoginMenu.getUser(cursor)
-
-	menu = ViewTweetMenu(cursor, user)
-	print(menu.showAndGet())
-
-	connection.close()

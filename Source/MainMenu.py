@@ -1,6 +1,8 @@
+from DateTools import DateTools
+from IDGenerator import IDGenerator
 from TerminalMenu import TerminalMenu
 from TableTools import TweetsTableTools
-from PostTweetMenu import PostTweetMenu
+from TweetTools import TweetTools
 from SearchMenu import SearchMenu
 from FollowersMenu import FollowersMenu
 from ViewTweetMenu import ViewTweetMenu
@@ -59,9 +61,7 @@ class MainMenu:
 
 		# If user chose to post a tweet
 		elif choice == MainMenu._POST_INDEX:
-			postTweetMenu = PostTweetMenu(cursor, self._userID)
-			result = postTweetMenu.showAndGet()
-			if result is None: return None        # If an exit key was pressed
+			self._postTweet()
 
 		# If user chose to search
 		elif choice == MainMenu._SEARCH_INDEX:
@@ -131,6 +131,16 @@ class MainMenu:
 
 		if len(tweets) == 0: tweets = None
 		self._displayedTweets = tweets
+
+	def _postTweet(self):
+		"""Let the user post a tweet"""
+
+		tweetText = input("Post:")
+		hashtags = TweetTools.getHashtags(tweetText)
+		date = DateTools.getCurrentDate()
+		tweetID = IDGenerator.getNewTweetID(self._cursor)
+		TweetsTableTools.addTweet(self._cursor, self._userID, date, tweetText,
+			tweetID, None, hashtags)
 
 # Interactive test
 if __name__ == "__main__":
