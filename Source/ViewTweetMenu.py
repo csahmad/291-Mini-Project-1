@@ -34,7 +34,7 @@ class ViewTweetMenu:
 
 		choice = ViewTweetMenu._INITIAL_INDEX
 
-		while choice is not None and choice != ViewTweetMenu.BACK_INDEX:
+		while choice == ViewTweetMenu._INITIAL_INDEX:
 			choice = self._showAndGet
 
 		return choice

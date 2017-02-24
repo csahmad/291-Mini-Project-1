@@ -31,7 +31,7 @@ class UserTweetsMenu:
 
 		choice = UserTweetsMenu._INITIAL_INDEX
 
-		while choice is not None and choice != UserTweetsMenu.BACK_INDEX:
+		while choice == UserTweetsMenu._INITIAL_INDEX:
 			choice = self._showAndGet()
 
 		return choice
@@ -59,3 +59,5 @@ class UserTweetsMenu:
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return UserTweetsMenu._INITIAL_INDEX
