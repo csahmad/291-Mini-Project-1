@@ -6,16 +6,19 @@ from GeneratorTools import GeneratorTools
 class GeneratorMenuChoice:
 	"""Represents a user choice from a TerminalGeneratorMenu"""
 
-	def __init__(self, chosenItem = None, chosenOptionIndex = None):
+	def __init__(self, chosenItem = None, chosenOptionIndex = None,
+		backWasChosen = False):
 		"""
 		Arguments:
 		chosenItem -- the item that was chosen (if any)
 		chosenOptionIndex -- the index of the non-generator-item option that
 			was chosen (if any)
+		backChosen -- whether the user chose the back option
 		"""
 
 		self._chosenItem = chosenItem
 		self._chosenOptionIndex = chosenOptionIndex
+		self._backWasChosen = backWasChosen
 
 	@property
 	def chosenItem(self):
@@ -26,6 +29,11 @@ class GeneratorMenuChoice:
 	def chosenOptionIndex(self):
 
 		return chosenOptionIndex
+
+	@property
+	def backWasChosen(self):
+
+		return self._backWasChosen
 
 	def itemWasChosen(self):
 		"""Return whether an item was chosen"""
@@ -40,10 +48,14 @@ class TerminalGeneratorMenu:
 	"""
 
 	_SEE_MORE_INDEX = 0
+	_BACK_INDEX = 1
+
 	_SEE_MORE_STRING = "See more"
+	_BACK_STRING = "Back"
 
 	def __init__(self, generator, pageSize = 5, otherOptions = None,
-		preMessage = None, postMessage = None):
+		preMessage = None, postMessage = None,
+		emptyMessage = "Nothing to display"):
 		"""
 		Arguments:
 		generator -- the generator to get the options from
@@ -52,6 +64,7 @@ class TerminalGeneratorMenu:
 			generator
 		preMessage -- the message to show above the menu
 		postMessage -- the message to show below the menu
+		emptyMessage -- the message to display if generator empty
 		"""
 
 		self._generator = generator
@@ -60,9 +73,10 @@ class TerminalGeneratorMenu:
 		self._otherOptions = otherOptions
 		self._preMessage = preMessage
 		self._postMessage = postMessage
+		self._emptyMessage = emptyMessage
 
-		self._displayedItems = None
-		self._displayedItemStrings = None
+		self._displayedItems = []
+		self._displayedItemStrings = []
 		self._exhaustedItems = False
 
 	def showAndGet(self):
@@ -87,10 +101,15 @@ class TerminalGeneratorMenu:
 
 		options = list(self._displayedItemStrings)
 
+		# If items not yet exhausted, include the option to see more
 		if not self._exhaustedItems:
 			options += [TerminalGeneratorMenu._SEE_MORE_STRING]
 
-		options += self._otherOptions
+		# If no items to display, indicate this in the pre-message
+		if len(self._displayedItems) == 0:
+			self._preMessage = self._emptyMessage
+
+		options += [TerminalGeneratorMenu._BACK_STRING] + self._otherOptions
 
 		menu = TerminalMenu(options, self._preMessage, self._postMessage)
 
@@ -121,6 +140,9 @@ class TerminalGeneratorMenu:
 			optionIndex == TerminalGeneratorMenu._SEE_MORE_INDEX:
 
 			return TerminalGeneratorMenu._SEE_MORE_INDEX
+
+		# If the user chose to go back, return a GeneratorMenuChoice
+		return GeneratorMenuChoice(backWasChosen = True)
 
 		# If another option was chosen, return a GeneratorMenuChoice
 		return GeneratorMenuChoice(chosenOptionIndex = optionIndex)
