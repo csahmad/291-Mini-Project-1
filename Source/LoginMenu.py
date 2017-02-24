@@ -12,8 +12,8 @@ class LoginMenu:
 
 	_MENU_OPTIONS = ("Sign in", "Sign up", "Exit")
 
-	_FORM_FIELDS = [FormField("Password", 4), FormField("Name", 20),
-		FormField("Email", 15), FormField("City", 12),
+	_FORM_FIELDS = [FormField("*Password", 4, isRequired = True),
+		FormField("Name", 20), FormField("Email", 15), FormField("City", 12),
 		FormField("Timezone", isNumeric = True)]
 
 	@staticmethod
