@@ -15,7 +15,8 @@ class MainMenu:
 	_POST_INDEX = 0
 	_SEARCH_INDEX = 1
 	_FOLLOWERS_INDEX = 2
-	LOGOUT_INDEX = 3
+	EXIT_INDEX = 3
+	BACK_INDEX = -2
 	_INITIAL_INDEX = -1
 
 	_OPTIONS = ["Post", "Search", "Followers", "Exit"]
@@ -30,7 +31,7 @@ class MainMenu:
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		MainMenu.LOGOUT_INDEX (if the user chose to logout)
+		MainMenu.BACK_INDEX (if the user chose to logout)
 		"""
 
 		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
@@ -46,7 +47,7 @@ class MainMenu:
 	def _showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		MainMenu.LOGOUT_INDEX (if the user chose to logout)
+		MainMenu.BACK_INDEX (if the user chose to logout)
 		"""
 
 		menu = TerminalGeneratorMenu(self._tweetGenerator,
@@ -59,8 +60,8 @@ class MainMenu:
 		# If an exit key was pressed, return None
 		if result is None: return None
 
-		# If the back option was chosen, return MainMenu.LOGOUT_INDEX
-		if result.backWasChosen: return MainMenu.LOGOUT_INDEX
+		# If the back option was chosen, return MainMenu.BACK_INDEX
+		if result.backWasChosen: return MainMenu.BACK_INDEX
 
 		# If a tweet was chosen, view the tweet
 		if result.itemWasChosen():
@@ -68,6 +69,10 @@ class MainMenu:
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		# If the exit option was chosen, return None
+		elif choice == MainMenu._EXIT_INDEX:
+			return None
 
 		# If user chose to post a tweet, let the user post a tweet
 		elif choice == MainMenu._POST_INDEX:
