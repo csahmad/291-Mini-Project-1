@@ -25,14 +25,16 @@ class MainMenu:
 
 		self._cursor = cursor
 		self._userID = userID
-		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
-			self._cursor, self._userID)
+		self._tweetGenerator = None
 
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
 		MainMenu.LOGOUT_INDEX (if the user chose to logout)
 		"""
+
+		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
+			self._cursor, self._userID)
 
 		choice = MainMenu._INITIAL_INDEX
 
