@@ -18,7 +18,7 @@ class MainMenu:
 	LOGOUT_INDEX = 3
 	_INITIAL_INDEX = -1
 
-	_OPTIONS = ["Post", "Search", "Followers", "Logout"]
+	_OPTIONS = ["Post", "Search", "Followers", "Exit"]
 	_EMPTY_MESSAGE = "No tweets to display"
 
 	def __init__(self, cursor, userID):
