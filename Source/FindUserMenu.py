@@ -1,3 +1,5 @@
+import re
+
 from TableTools import UsersTableTools
 from TerminalMenu import TerminalGeneratorMenu
 
@@ -25,9 +27,9 @@ class FindUserMenu:
 		FindUserMenu.BACK_INDEX
 		"""
 
-		keyword = input("Enter keyword:")
+		keywords = input("Enter keywords:")
 		self._resultsGenerator = UsersTableTools.findUsers(self._cursor,
-			keyword)
+			re.split("\s|\s*,\s*", keywords))
 
 		choice = FindUserMenu._INITIAL_INDEX
 
