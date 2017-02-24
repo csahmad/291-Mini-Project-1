@@ -438,11 +438,13 @@ class UsersTableTools:
 		length)
 		"""
 
+		keyword = keyword.lower()
+
 		rankStatement = TableTools.rankStatement("length(usr)",
 			descending = False)
 
 		rankedSelect = \
-			"select usr, {0} from {1} where name like '%{2}%'".format(
+			"select usr, {0} from {1} where lower(name) like '%{2}%'".format(
 				rankStatement, UsersTableTools._USERS_TABLE, keyword)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
@@ -455,11 +457,13 @@ class UsersTableTools:
 		length)
 		"""
 
+		keyword = keyword.lower()
+
 		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
 		rankedSelect = \
-			"select city, {0} from {1} where name like '%{2}%'".format(
+			"select city, {0} from {1} where lower(name) like '%{2}%'".format(
 				rankStatement, UsersTableTools._USERS_TABLE, keyword)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
