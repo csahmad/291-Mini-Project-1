@@ -64,9 +64,7 @@ class MainMenu:
 		if result.itemWasChosen():
 			viewTweetMenu = ViewTweetMenu(self._cursor, self._userID,
 				result.chosenItem)
-			print("yay")
 			result = viewTweetMenu.showAndGet()
-			print("damn")
 			if result is None: return None        # If an exit key was pressed
 
 		# If user chose to post a tweet, let the user post a tweet
@@ -84,6 +82,8 @@ class MainMenu:
 			followersMenu = FollowersMenu(self._cursor, self._userID)
 			result = followersMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return MainMenu._INITIAL_INDEX
 
 	def _postTweet(self):
 		"""Let the user post a tweet"""

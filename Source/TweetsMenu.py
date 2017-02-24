@@ -59,3 +59,5 @@ class TweetsMenu:
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return TweetsMenu._INITIAL_INDEX

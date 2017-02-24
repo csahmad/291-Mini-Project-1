@@ -6,12 +6,26 @@ class SearchMenu:
 	_FIND_TWEET_INDEX = 0
 	_FIND_USER_INDEX = 1
 	BACK_INDEX = 2
+	_INITIAL_INDEX = -1
 
 	def __init__(self, cursor, userID):
 
 		self._userID = userID
 
 	def showAndGet(self):
+		"""
+		Show the search menu and return either SearchMenu.BACK_INDEX (if the
+		user
+		"""
+
+		choice = SearchMenu._INITIAL_INDEX
+
+		while choice is not None and choice != SearchMenu.BACK_INDEX:
+			choice = self._showAndGet
+
+		return choice
+
+	def _showAndGet(self):
 		"""
 		Show the search menu and return either SearchMenu.BACK_INDEX (if the
 		user chose the "back" option) or None (if an exit key was pressed)
@@ -39,7 +53,7 @@ class SearchMenu:
 		else:
 			return SearchMenu.BACK_INDEX
 
-		return self.showAndGet()
+		return SearchMenu._INITIAL_INDEX
 
 	def _findTweet(self):
 		"""Let the user enter a keyword and find matching tweets"""

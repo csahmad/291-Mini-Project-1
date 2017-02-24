@@ -79,3 +79,5 @@ class ViewUserMenu:
 		else:
 			tweetsMenu = UserTweetsMenu(self._cursor, self._loginID,
 				self._userID)
+
+		return ViewUserMenu._INITIAL_INDEX

@@ -39,7 +39,7 @@ class OracleTerminalConnection:
 			print("Error:")
 			print(error)
 			input("")
-			OracleTerminalConnection.connect()
+			return OracleTerminalConnection.connect()
 
 if __name__ == "__main__":
 	OracleTerminalConnection.connect()

@@ -85,3 +85,5 @@ class ViewTweetMenu:
 				retweetDate)
 			self._isRetweetedByUser = True
 			self._tweetStats.addRetweet()
+
+		return ViewTweetMenu._INITIAL_INDEX

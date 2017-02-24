@@ -59,3 +59,5 @@ class UsersMenu:
 				result.chosenItem)
 			result = viewUserMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return UsersMenu._INITIAL_INDEX

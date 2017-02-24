@@ -1,1 +1,22 @@
-Will describe test cases here with expected output
+Reset data:
+cd Data
+sqlplus
+@makeTables
+@addData
+commit;
+
+Login:
+username: 105
+password: fa05
+(Sara Farazi, sara@gmail.com, Edmonton, Timezone: -7)
+(user is following: 102)
+(user is being followed by: 100, 101, 102, 103)
+
+Main screen:
+Should see tweets (in this order):
+3 (user: 102, 10-JAN-2017, "Computer Engineering>Computer Science.") (lies)
+27 (user: 102, 27-DEC-2016, "Thats just like,your opinion man...", to: 24)
+2 (user: 102, 25-DEC-2016, "Hate to say it but #edgyidea.")
+
+Select tweet 3:
+I
