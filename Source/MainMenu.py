@@ -18,7 +18,7 @@ class MainMenu:
 	_FOLLOWERS_INDEX = 2
 	LOGOUT_INDEX = 3
 
-	_OPTIONS = ("Post", "Search", "Followers", "Logout")
+	_OPTIONS = ["Post", "Search", "Followers", "Logout"]
 	_EMPTY_MESSAGE = "No tweets to display"
 
 	def __init__(self, cursor, userID):
