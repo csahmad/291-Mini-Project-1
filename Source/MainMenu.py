@@ -62,7 +62,7 @@ class MainMenu:
 
 		# If a tweet was chosen, view the tweet
 		if result.itemWasChosen():
-			viewTweetMenu = ViewTweetMenu(cursor, self._userID,
+			viewTweetMenu = ViewTweetMenu(self._cursor, self._userID,
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
@@ -73,13 +73,13 @@ class MainMenu:
 
 		# If user chose to search, open the search menu
 		elif choice == MainMenu._SEARCH_INDEX:
-			searchMenu = SearchMenu(cursor, self._userID)
+			searchMenu = SearchMenu(self._cursor, self._userID)
 			result = searchMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
 
 		# If user chose to view followers, show followers
 		elif choice == MainMenu._FOLLOWERS_INDEX:
-			followersMenu = FollowersMenu(cursor, self._userID)
+			followersMenu = FollowersMenu(self._cursor, self._userID)
 			result = followersMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
 
