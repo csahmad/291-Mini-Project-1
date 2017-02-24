@@ -330,8 +330,8 @@ class TweetsTableTools:
 		text = TableTools.replaceWithNull(text)
 		replyTo = TableTools.replaceWithNull(replyTo)
 
-		TableTools.insert(TweetsTableTools._TWEETS_TABLE, [tweetID, writer,
-			date, text, replyTo])
+		TableTools.insert(cursor, TweetsTableTools._TWEETS_TABLE,
+			[tweetID, writer, date, text, replyTo])
 
 		for hashtag in hashtags:
 
@@ -482,8 +482,8 @@ class UsersTableTools:
 		city = TableTools.replaceWithNull(city)
 		timezone = TableTools.replaceWithNull(timezone)
 
-		TableTools.insert(UsersTableTools._USERS_TABLE, [userID, password,
-			name, email, city, timezone])
+		TableTools.insert(cursor, UsersTableTools._USERS_TABLE,
+			[userID, password, name, email, city, timezone])
 
 	@staticmethod
 	def userExists(cursor, userID):
