@@ -17,6 +17,7 @@ class MainMenu:
 	_SEARCH_INDEX = 1
 	_FOLLOWERS_INDEX = 2
 	LOGOUT_INDEX = 3
+	_INITIAL_INDEX = -1
 
 	_OPTIONS = ["Post", "Search", "Followers", "Logout"]
 	_EMPTY_MESSAGE = "No tweets to display"
@@ -31,7 +32,20 @@ class MainMenu:
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
-		MainMenu.LOGOUT_INDEX if the user chose to logout
+		MainMenu.LOGOUT_INDEX (if the user chose to logout)
+		"""
+
+		choice = MainMenu._INITIAL_INDEX
+
+		while choice is not None and choice != MainMenu.LOGOUT_INDEX:
+			choice = self._showAndGet()
+
+		return choice
+
+	def _showAndGet(self):
+		"""
+		Show the menu and return either None (if an exit key was pressed) or
+		MainMenu.LOGOUT_INDEX (if the user chose to logout)
 		"""
 
 		menu = TerminalGeneratorMenu(self._tweetGenerator,
@@ -44,8 +58,8 @@ class MainMenu:
 		# If an exit key was pressed, return None
 		if result is None: return None
 
-		# If the back option was chosen, show the menu again
-		if result.backWasChosen: return self.showAndGet()
+		# If the back option was chosen, return MainMenu.LOGOUT_INDEX
+		if result.backWasChosen: return MainMenu.LOGOUT_INDEX
 
 		# If a tweet was chosen, view the tweet
 		if result.itemWasChosen():
@@ -69,14 +83,6 @@ class MainMenu:
 			followersMenu = FollowersMenu(cursor, self._userID)
 			result = followersMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
-
-		# If user chose to logout, return MainMenu.LOGOUT_INDEX
-		elif choice == MainMenu.LOGOUT_INDEX:
-			return MainMenu.LOGOUT_INDEX
-
-		# If user did not exit or logout yet (no value returned yet), show menu
-		# again
-		return self.showAndGet()
 
 	def _postTweet(self):
 		"""Let the user post a tweet"""
