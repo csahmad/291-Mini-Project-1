@@ -9,6 +9,7 @@ class ViewTweetMenu:
 	BACK_INDEX = 0
 	_REPLY_INDEX = 1
 	_RETWEET_INDEX = 2
+	_INITIAL_INDEX = -1
 
 	_OPTIONS_WITHOUT_RETWEET = ["Back", "Reply"]
 	_OPTIONS = ["Back", "Reply", "Retweet"]
@@ -31,6 +32,19 @@ class ViewTweetMenu:
 		option chosen) or None (if an exit key was pressed)
 		"""
 
+		choice = ViewTweetMenu._INITIAL_INDEX
+
+		while choice is not None and choice != ViewTweetMenu.BACK_INDEX:
+			choice = self._showAndGet
+
+		return choice
+
+	def _showAndGet(self):
+		"""
+		Show the menu and return either ViewTweetMenu.BACK_INDEX (if back
+		option chosen) or None (if an exit key was pressed)
+		"""
+
 		if self._isRetweetedByUser:
 
 			preMessage = self._tweetString + "\n\t" + \
@@ -48,9 +62,9 @@ class ViewTweetMenu:
 		# If an exit key was pressed, return None
 		if choice is None: return None
 
-		# If user chose to go back, return choice
+		# If user chose to go back, return ViewTweetMenu.BACK_INDEX
 		if choice == ViewTweetMenu.BACK_INDEX:
-			return choice
+			return ViewTweetMenu.BACK_INDEX
 
 		# If user chose to reply to the tweet, let user write reply
 		if choice == ViewTweetMenu._REPLY_INDEX:
@@ -71,5 +85,3 @@ class ViewTweetMenu:
 				retweetDate)
 			self._isRetweetedByUser = True
 			self._tweetStats.addRetweet()
-
-		return self.showAndGet()
