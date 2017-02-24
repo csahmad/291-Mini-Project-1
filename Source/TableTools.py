@@ -103,8 +103,6 @@ class TableTools:
 		the column named rankName
 		"""
 
-		print("select * from ({0}) where rank = 1".format(statement) + "\n\n")
-
 		cursor.execute("select * from ({0}) where rank = 1".format(statement))
 
 		result = cursor.fetchone()
