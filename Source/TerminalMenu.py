@@ -124,6 +124,12 @@ class TerminalGeneratorMenu:
 		Return None if None given
 		"""
 
+		seeMoreIndex = TerminalGeneratorMenu._SEE_MORE_INDEX
+		backIndex = TerminalGeneratorMenu._BACK_INDEX
+
+		if self._exhaustedItems:
+			backIndex -= 1
+
 		if index is None: return None
 
 		count = len(self._displayedItems)
@@ -136,13 +142,12 @@ class TerminalGeneratorMenu:
 
 		# If the user chose to see more, return
 		# TerminalGeneratorMenu._SEE_MORE_INDEX
-		if not self._exhaustedItems and \
-			optionIndex == TerminalGeneratorMenu._SEE_MORE_INDEX:
-
-			return TerminalGeneratorMenu._SEE_MORE_INDEX
+		if not self._exhaustedItems and optionIndex == seeMoreIndex:
+			return seeMoreIndex
 
 		# If the user chose to go back, return a GeneratorMenuChoice
-		return GeneratorMenuChoice(backWasChosen = True)
+		if optionIndex == backIndex
+			return GeneratorMenuChoice(backWasChosen = True)
 
 		# If another option was chosen, return a GeneratorMenuChoice
 		return GeneratorMenuChoice(chosenOptionIndex = optionIndex)
