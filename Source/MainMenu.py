@@ -1,3 +1,4 @@
+from GeneratorTools import GeneratorTools
 from DateTools import DateTools
 from IDGenerator import IDGenerator
 from TerminalMenu import TerminalMenu
@@ -121,16 +122,11 @@ class MainMenu:
 	def _getNextTweets(self, amount = 5):
 		"""Store the next few tweets or None if no more"""
 
-		generator = self._tweetGenerator
+		self._displayedTweets = GeneratorTools.next(self._tweetGenerator,
+			amount)
 
-		# Get next few tweets and pad with None if not enough tweets left
-		tweets = [next(generator, None) for _ in range(amount)]
-
-		# Remove None values
-		tweets = [tweet for tweet in tweets if tweet is not None]
-
-		if len(tweets) == 0: tweets = None
-		self._displayedTweets = tweets
+		if len(self._displayedTweets) == 0:
+			self._displayedTweets = None
 
 	def _postTweet(self):
 		"""Let the user post a tweet"""
