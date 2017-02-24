@@ -23,12 +23,12 @@ class GeneratorMenuChoice:
 	@property
 	def chosenItem(self):
 
-		return chosenItem
+		return self._chosenItem
 
 	@property
 	def chosenOptionIndex(self):
 
-		return chosenOptionIndex
+		return self._chosenOptionIndex
 
 	@property
 	def backWasChosen(self):
