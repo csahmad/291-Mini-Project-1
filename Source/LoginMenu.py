@@ -71,7 +71,7 @@ class LoginMenu:
 				userID = IDGenerator.getNewUserID(cursor)
 				values = result.values
 
-				UsersTableTools.addUser(cursor, values["Password"],
+				UsersTableTools.addUser(cursor, values["*Password"],
 					values["Name"], values["Email"], values["City"],
 					values["Timezone"], userID)
 
