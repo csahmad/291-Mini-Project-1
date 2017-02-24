@@ -24,7 +24,7 @@ class LoginMenu:
 		pressed)
 		"""
 
-		return LoginMenu._showAndGet()
+		return LoginMenu._showAndGet(cursor)
 
 	@staticmethod
 	def _showAndGet(cursor, loginFailed = False):
