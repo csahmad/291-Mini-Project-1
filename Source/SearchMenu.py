@@ -44,14 +44,12 @@ class SearchMenu:
 	def _findTweet(self):
 		"""Let the user enter a keyword and find matching tweets"""
 
-		keyword = input("Enter keyword:")
 		menu = FindTweetMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 
 	def _findUser(self):
 		"""Let the user enter a keyword and find matching users"""
 
-		keyword = input("Enter keyword:")
 		menu = FindUserMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 

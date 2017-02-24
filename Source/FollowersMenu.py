@@ -3,6 +3,7 @@ class FollowersMenu:
 
 	def __init__(cursor, userID):
 
+		self._cursor = cursor
 		self._userID = userID
 
 	def showAndGet(self):
