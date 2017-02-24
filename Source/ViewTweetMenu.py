@@ -14,7 +14,7 @@ class ViewTweetMenu:
 	_OPTIONS_WITHOUT_RETWEET = ["Back", "Reply"]
 	_OPTIONS = ["Back", "Reply", "Retweet"]
 
-	def __init__(cursor, userID, tweet):
+	def __init__(self, cursor, userID, tweet):
 
 		self._cursor = cursor
 		self._userID = userID
