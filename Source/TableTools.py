@@ -103,6 +103,8 @@ class TableTools:
 		the column named rankName
 		"""
 
+		print("select * from ({0}) where rank = 1".format(statement) + "\n\n")
+
 		cursor.execute("select * from ({0}) where rank = 1".format(statement))
 
 		result = cursor.fetchone()
@@ -335,6 +337,20 @@ class FollowsTableTools:
 		for result in TableTools.yieldResults(cursor, statement):
 			yield result
 
+	@staticmethod
+	def follow(cursor, follower, followee, date):
+		"""Make follower follow followee"""
+
+		TableTools.insert(cursor, FollowsTableTools._FOLLOWS_TABLE,
+			[follower, followee, date])
+
+	@staticmethod
+	def isFollowing(cursor, follower, followee):
+		"""Return whether follower is following followee"""
+
+		return TableTools.exists(cursor, FollowsTableTools._FOLLOWS_TABLE,
+			{"flwer": follower, "flwee": followee})
+
 class UsersTableTools:
 	"""Tools for working with users"""
 
@@ -391,17 +407,13 @@ class UsersTableTools:
 		name length)
 		"""
 
-		# Make keywords lowercase and surround each with "%"s and "'"s
-		keywords = ["'%{0}%'".format(keyword.lower())
-			for keyword in keywords]
-
 		rankStatement = TableTools.rankStatement("length(usr)",
 			descending = False)
 
-		rankedSelect = \
-			"select usr, {0} from {1} where lower(name) like any({2})".format(
-				rankStatement, UsersTableTools._USERS_TABLE,
-				", ".join(keywords))
+		like = "regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+
+		rankedSelect = "select usr, {0} from {1} where {2}".format(
+				rankStatement, UsersTableTools._USERS_TABLE, like)
 
 		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
 			yield result
@@ -414,18 +426,15 @@ class UsersTableTools:
 		length)
 		"""
 
-		# Make keywords lowercase and surround each with "%"s and "'"s
-		keywords = ["'%{0}%'".format(keyword.lower())
-			for keyword in keywords]
-
-		anyString = "any({0})".format(", ".join(keywords))
-
 		rankStatement = TableTools.rankStatement("length(city)",
 			descending = False)
 
-		whereConditions = \
-			"lower(city) like {0} and lower(name) not like {0}".format(
-				anyString)
+		cityLike = "regexp_like (city, '{0}', 'i')".format("|".join(keywords))
+
+		nameNotLike = \
+			"not regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+
+		whereConditions = "{0} and {1}".format(cityLike, nameNotLike)
 
 		rankedSelect = \
 			"select usr, {0} from {1} where ".format(rankStatement,
