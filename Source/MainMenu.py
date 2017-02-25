@@ -35,9 +35,6 @@ class MainMenu:
 		MainMenu.BACK_INDEX (if the user chose to logout)
 		"""
 
-		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
-			self._cursor, self._userID)
-
 		choice = MainMenu._INITIAL_INDEX
 
 		while choice == MainMenu._INITIAL_INDEX:
@@ -50,6 +47,9 @@ class MainMenu:
 		Show the menu and return either None (if an exit key was pressed) or
 		MainMenu.BACK_INDEX (if the user chose to logout)
 		"""
+
+		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
+			self._cursor, self._userID)
 
 		menu = TerminalGeneratorMenu(self._tweetGenerator,
 			otherOptions = MainMenu._OPTIONS,
