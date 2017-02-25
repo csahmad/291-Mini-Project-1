@@ -115,7 +115,11 @@ if __name__ == "__main__":
 
 	user = LoginMenu.getUser(cursor)
 
-	mainMenu = MainMenu(cursor, user)
-	print(mainMenu.showAndGet())
+	if user is None:
+		print("Bye")
+
+	else:
+		mainMenu = MainMenu(cursor, user)
+		print(mainMenu.showAndGet())
 
 	connection.close()
