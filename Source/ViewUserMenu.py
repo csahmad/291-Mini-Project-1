@@ -47,7 +47,7 @@ class ViewUserMenu:
 		option chosen) or None (if an exit key was pressed)
 		"""
 
-		preMessage = self._userID + "\n\t" + self._userStats
+		preMessage = str(self._userID) + "\n\t" + self._userStats
 
 		if self._isFollowing:
 			preMessage = "You follow this user" + preMessage
