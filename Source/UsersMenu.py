@@ -55,7 +55,7 @@ class UsersMenu:
 
 		# If a user was chosen, view the user
 		else:
-			viewUserMenu = ViewUserMenu(cursor, self._userID,
+			viewUserMenu = ViewUserMenu(self._cursor, self._userID,
 				result.chosenItem)
 			result = viewUserMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
