@@ -32,8 +32,6 @@ class Main:
 		while result == MainMenu.BACK_INDEX:
 			result = Main._loginAndRun_(cursor)
 
-		return
-
 	@staticmethod
 	def _loginAndRun_(cursor):
 		"""
@@ -51,6 +49,9 @@ class Main:
 		# Run the main menu
 		mainMenu = MainMenu(cursor, user)
 		result = mainMenu.showAndGet()
+
+		# If an exit key was pressed, return None
+		if result is None: return None
 
 		# If the user chose to logout, return MainMenu.BACK_INDEX
 		return MainMenu.BACK_INDEX
