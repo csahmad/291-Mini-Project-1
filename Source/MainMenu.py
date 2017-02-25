@@ -55,13 +55,14 @@ class MainMenu:
 			emptyMessage = MainMenu._EMPTY_MESSAGE)
 
 		result = menu.showAndGet()
-		choice = result.chosenOptionIndex
 
 		# If an exit key was pressed, return None
 		if result is None: return None
 
 		# If the back option was chosen, return MainMenu.BACK_INDEX
 		if result.backWasChosen: return MainMenu.BACK_INDEX
+
+		choice = result.chosenOptionIndex
 
 		# If a tweet was chosen, view the tweet
 		if result.itemWasChosen():
