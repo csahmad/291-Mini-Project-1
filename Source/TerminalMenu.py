@@ -23,7 +23,7 @@ class GeneratorMenuChoice:
 	def __str__(self):
 
 		if self._backWasChosen: return "<Back>"
-		if self.ititemWasChosen(): return self._chosenItem
+		if self.itemWasChosen(): return self._chosenItem
 		return "<Option " + str(self._chosenOptionIndex) + ">"
 
 	@property
