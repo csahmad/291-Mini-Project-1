@@ -18,9 +18,25 @@ class Main:
 
 		Main._loginAndRun(cursor)        # Run
 
-		# Commit and exit
+		Main._commitAndExit(connection, commitChanges)
+
+	@staticmethod
+	def _commitAndExit(connection, commitChanges):
+		"""
+		Show the exit message and close the connection
+
+		Commit changes if commitChanges True, otherwise rollback
+		"""
+
 		Main._showExitMessage()
-		if commitChanges: connection.commit()
+
+		if commitChanges:
+			connection.commit()
+
+		else:
+			connection.rollback()
+			print("Changes rolled back")
+
 		connection.close()
 
 	@staticmethod
