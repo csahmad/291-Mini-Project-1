@@ -326,7 +326,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE, followee)
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def getFollowing(cursor, follower):
@@ -336,7 +336,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE, follower)
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def follow(cursor, follower, followee, date):
