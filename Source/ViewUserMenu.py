@@ -37,7 +37,7 @@ class ViewUserMenu:
 		choice = ViewUserMenu._INITIAL_INDEX
 
 		while choice is not None and choice != ViewUserMenu.BACK_INDEX:
-			choice = self._showAndGet
+			choice = self._showAndGet()
 
 		return choice
 

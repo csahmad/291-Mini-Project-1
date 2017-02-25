@@ -35,7 +35,7 @@ class ViewTweetMenu:
 		choice = ViewTweetMenu._INITIAL_INDEX
 
 		while choice == ViewTweetMenu._INITIAL_INDEX:
-			choice = self._showAndGet
+			choice = self._showAndGet()
 
 		return choice
 
