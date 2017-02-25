@@ -1,4 +1,6 @@
 from TerminalMenu import TerminalMenu
+from FindTweetMenu import FindTweetMenu
+from FindUserMenu import FindUserMenu
 
 class SearchMenu:
 	"""The menu for searching for tweets or users"""
