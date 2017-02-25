@@ -385,7 +385,7 @@ class UsersTableTools:
 	def getFollowerCount(cursor, userID):
 		"""Return the number of people following this user"""
 
-		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
 			"flwee = {0}".format(userID))
 
 	@staticmethod
