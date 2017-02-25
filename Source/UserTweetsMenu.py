@@ -20,8 +20,7 @@ class UserTweetsMenu:
 		self._cursor = cursor
 		self._loginID = loginID
 		self._userID = userID
-		self._resultsGenerator = TweetsTableTools.getTweetsByDate(cursor,
-			userID)
+		self._resultsGenerator = None
 
 	def showAndGet(self):
 		"""
@@ -41,6 +40,9 @@ class UserTweetsMenu:
 		Show the menu and return either None (if an exit key was pressed) or
 		UserTweetsMenu.BACK_INDEX
 		"""
+
+		self._resultsGenerator = TweetsTableTools.getTweetsByDate(cursor,
+			userID)
 
 		menu = TerminalGeneratorMenu(self._resultsGenerator,
 			emptyMessage = UserTweetsMenu._EMPTY_MESSAGE)
