@@ -371,14 +371,14 @@ class UsersTableTools:
 	def getTweetCount(cursor, userID):
 		"""Return the number of tweets from the given user"""
 
-		return getCount(cursor, UsersTableTools._TWEETS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._TWEETS_TABLE,
 			"writer = {0}".format(userID))
 
 	@staticmethod
 	def getFollowingCount(cursor, userID):
 		"""Return the number of people this user is following"""
 
-		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
 			"flwer = {0}".format(userID))
 
 	@staticmethod
