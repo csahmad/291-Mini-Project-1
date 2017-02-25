@@ -12,6 +12,7 @@ class SearchMenu:
 
 	def __init__(self, cursor, userID):
 
+		self._cursor = cursor
 		self._userID = userID
 
 	def showAndGet(self):
