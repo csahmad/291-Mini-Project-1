@@ -21,7 +21,7 @@ class SearchMenu:
 		choice = SearchMenu._INITIAL_INDEX
 
 		while choice == SearchMenu._INITIAL_INDEX:
-			choice = self._showAndGet
+			choice = self._showAndGet()
 
 		return choice
 
