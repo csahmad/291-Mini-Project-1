@@ -79,5 +79,7 @@ class ViewUserMenu:
 		else:
 			tweetsMenu = UserTweetsMenu(self._cursor, self._loginID,
 				self._userID)
+			result = tweetsMenu.showAndGet()
+			if result is None: return None        # If an exit key was pressed
 
 		return ViewUserMenu._INITIAL_INDEX
