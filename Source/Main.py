@@ -27,19 +27,33 @@ class Main:
 	def _loginAndRun(cursor):
 		"""Let the user login/sign up and run the main menu"""
 
+		result = MainMenu.BACK_INDEX
+
+		while result == MainMenu.BACK_INDEX:
+			result = Main._loginAndRun_(cursor)
+
+		return
+
+	@staticmethod
+	def _loginAndRun_(cursor):
+		"""
+		Let the user login/sign up and run the main menu
+
+		Return either MainMenu.BACK_INDEX (if the user chose to logout) or
+		None (if the user chose to exit)
+		"""
+
 		user = LoginMenu.getUser(cursor)
 
-		# If an exit key was pressed, return
-		if user is None: return
+		# If an exit key was pressed, return None
+		if user is None: return None
 
 		# Run the main menu
 		mainMenu = MainMenu(cursor, user)
 		result = mainMenu.showAndGet()
 
-		# If the user signed out, let the user sign in again or sign up, then
-		# run the main menu again
-		if result == MainMenu.BACK_INDEX:
-			Main._loginAndRun(cursor)
+		# If the user chose to logout, return MainMenu.BACK_INDEX
+		return MainMenu.BACK_INDEX
 
 	@staticmethod
 	def _showExitMessage():
