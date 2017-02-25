@@ -94,7 +94,6 @@ class TableTools:
 
 		while result is not None:
 			yield result
-			cursor.execute(statement)
 			result = cursor.fetchone()
 
 	@staticmethod
@@ -105,20 +104,13 @@ class TableTools:
 		"""
 
 		cursor.execute("select * from ({0}) where rank = 1".format(statement))
-
 		result = cursor.fetchone()
 
 		i = 1
 
 		while result is not None:
-
 			yield result
-
 			i += 1
-
-			cursor.execute(
-				"select * from ({0}) where rank = {1}".format(statement, i))
-
 			result = cursor.fetchone()
 
 	@staticmethod
