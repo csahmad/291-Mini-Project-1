@@ -29,7 +29,7 @@ class TerminalInterface:
 
 			while not CheckStringFormat.isInt(username):
 				TerminalInterface.tryClear()
-				print(usernamePrompt + " must be an integer")
+				print("Must be an integer")
 				username = input(usernamePrompt)
 
 		password = getpass(passwordPrompt)

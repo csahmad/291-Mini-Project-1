@@ -37,7 +37,7 @@ class ViewUserMenu:
 		choice = ViewUserMenu._INITIAL_INDEX
 
 		while choice is not None and choice != ViewUserMenu.BACK_INDEX:
-			choice = self._showAndGet
+			choice = self._showAndGet()
 
 		return choice
 
@@ -47,14 +47,14 @@ class ViewUserMenu:
 		option chosen) or None (if an exit key was pressed)
 		"""
 
-		preMessage = self._userID + "\n\t" + self._userStats
+		preMessage = str(self._userID) + "\n\t" + str(self._userStats)
 
 		if self._isFollowing:
 			preMessage = "You follow this user" + preMessage
-			options = _OPTIONS_WITHOUT_FOLLOW
+			options = ViewUserMenu._OPTIONS_WITHOUT_FOLLOW
 
 		else:
-			options = _OPTIONS
+			options = ViewUserMenu._OPTIONS
 
 		menu = TerminalMenu(options, preMessage)
 		choice = menu.showAndGet()
@@ -79,3 +79,7 @@ class ViewUserMenu:
 		else:
 			tweetsMenu = UserTweetsMenu(self._cursor, self._loginID,
 				self._userID)
+			result = tweetsMenu.showAndGet()
+			if result is None: return None        # If an exit key was pressed
+
+		return ViewUserMenu._INITIAL_INDEX

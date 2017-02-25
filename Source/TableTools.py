@@ -94,7 +94,6 @@ class TableTools:
 
 		while result is not None:
 			yield result
-			cursor.execute(statement)
 			result = cursor.fetchone()
 
 	@staticmethod
@@ -105,20 +104,13 @@ class TableTools:
 		"""
 
 		cursor.execute("select * from ({0}) where rank = 1".format(statement))
-
 		result = cursor.fetchone()
 
 		i = 1
 
 		while result is not None:
-
 			yield result
-
 			i += 1
-
-			cursor.execute(
-				"select * from ({0}) where rank = {1}".format(statement, i))
-
 			result = cursor.fetchone()
 
 	@staticmethod
@@ -326,7 +318,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE, followee)
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def getFollowing(cursor, follower):
@@ -336,7 +328,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE, follower)
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def follow(cursor, follower, followee, date):
@@ -371,21 +363,21 @@ class UsersTableTools:
 	def getTweetCount(cursor, userID):
 		"""Return the number of tweets from the given user"""
 
-		return getCount(cursor, UsersTableTools._TWEETS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._TWEETS_TABLE,
 			"writer = {0}".format(userID))
 
 	@staticmethod
 	def getFollowingCount(cursor, userID):
 		"""Return the number of people this user is following"""
 
-		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
 			"flwer = {0}".format(userID))
 
 	@staticmethod
 	def getFollowerCount(cursor, userID):
 		"""Return the number of people following this user"""
 
-		return getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
 			"flwee = {0}".format(userID))
 
 	@staticmethod

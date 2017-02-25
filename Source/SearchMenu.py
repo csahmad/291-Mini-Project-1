@@ -1,4 +1,7 @@
 from TerminalMenu import TerminalMenu
+from FindTweetMenu import FindTweetMenu
+from FindUserMenu import FindUserMenu
+from TerminalInterface import TerminalInterface
 
 class SearchMenu:
 	"""The menu for searching for tweets or users"""
@@ -6,18 +9,33 @@ class SearchMenu:
 	_FIND_TWEET_INDEX = 0
 	_FIND_USER_INDEX = 1
 	BACK_INDEX = 2
+	_INITIAL_INDEX = -1
 
 	def __init__(self, cursor, userID):
 
+		self._cursor = cursor
 		self._userID = userID
 
 	def showAndGet(self):
 		"""
 		Show the search menu and return either SearchMenu.BACK_INDEX (if the
+		user
+		"""
+
+		choice = SearchMenu._INITIAL_INDEX
+
+		while choice == SearchMenu._INITIAL_INDEX:
+			choice = self._showAndGet()
+
+		return choice
+
+	def _showAndGet(self):
+		"""
+		Show the search menu and return either SearchMenu.BACK_INDEX (if the
 		user chose the "back" option) or None (if an exit key was pressed)
 		"""
 
-		menu = TerminalMenu(["Find a tweet", "Find a user"])
+		menu = TerminalMenu(["Find a tweet", "Find a user", "Back"])
 		choice = menu.showAndGet()
 
 		# If an exit key was pressed, return None
@@ -39,17 +57,19 @@ class SearchMenu:
 		else:
 			return SearchMenu.BACK_INDEX
 
-		return self.showAndGet()
+		return SearchMenu._INITIAL_INDEX
 
 	def _findTweet(self):
 		"""Let the user enter a keyword and find matching tweets"""
 
+		TerminalInterface.tryClear()
 		menu = FindTweetMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 
 	def _findUser(self):
 		"""Let the user enter a keyword and find matching users"""
 
+		TerminalInterface.tryClear()
 		menu = FindUserMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 

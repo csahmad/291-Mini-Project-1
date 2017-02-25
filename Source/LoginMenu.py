@@ -9,6 +9,7 @@ class LoginMenu:
 
 	_SIGN_IN_INDEX = 0
 	_SIGN_UP_INDEX = 1
+	_INITIAL_INDEX = -1
 
 	_MENU_OPTIONS = ("Sign in", "Sign up", "Exit")
 

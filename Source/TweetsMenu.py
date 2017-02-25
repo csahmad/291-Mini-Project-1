@@ -31,7 +31,7 @@ class TweetsMenu:
 
 		choice = TweetsMenu._INITIAL_INDEX
 
-		while choice is not None and choice != TweetsMenu.BACK_INDEX:
+		while choice == TweetsMenu._INITIAL_INDEX:
 			choice = self._showAndGet()
 
 		return choice
@@ -59,3 +59,5 @@ class TweetsMenu:
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return TweetsMenu._INITIAL_INDEX

@@ -31,7 +31,7 @@ class UsersMenu:
 
 		choice = UsersMenu._INITIAL_INDEX
 
-		while choice is not None and choice != UsersMenu.BACK_INDEX:
+		while choice == UsersMenu._INITIAL_INDEX:
 			choice = self._showAndGet()
 
 		return choice
@@ -55,7 +55,9 @@ class UsersMenu:
 
 		# If a user was chosen, view the user
 		else:
-			viewUserMenu = ViewUserMenu(cursor, self._userID,
+			viewUserMenu = ViewUserMenu(self._cursor, self._userID,
 				result.chosenItem)
 			result = viewUserMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
+
+		return UsersMenu._INITIAL_INDEX
