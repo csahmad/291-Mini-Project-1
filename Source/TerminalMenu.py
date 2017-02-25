@@ -145,10 +145,10 @@ class TerminalGeneratorMenu:
 
 		if self._exhaustedItems:
 			backIndex -= 1
-			optionIndex = index
+			optionIndex = index - 1
 
 		else:
-			optionIndex = index - 1
+			optionIndex = index - 2
 
 		# If the user chose to see more, return
 		# TerminalGeneratorMenu._SEE_MORE_INDEX
@@ -277,6 +277,6 @@ if __name__ == "__main__":
 		for item in items: yield item
 
 	generator = itemGenerator()
-	options = ["Option 1", "Option 2"]
+	options = ["Option 0", "Option 1"]
 	menu = TerminalGeneratorMenu(generator, otherOptions = options)
 	print(menu.showAndGet())
