@@ -15,8 +15,10 @@ class Search:
 
     def searchmentions(cursor, keyword):
         print("to be searched %s" % keyword)
-        fkeyword = Search.formatsearch(keyword)
-        cursor.execute("select * from mentions where upper(term) like '{0}".format(fkeyword))
+        cursor.execute("select * from mentions where upper(term) = '{0}'".format(keyword))
+        result = cursor.fetchall()
+        print(result)
+        return result
 
     def searchtweet(cursor, keyword):
         fkeyword = Search.formatsearch(keyword)
