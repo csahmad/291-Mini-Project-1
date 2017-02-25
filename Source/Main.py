@@ -38,7 +38,7 @@ class Main:
 
 		# If the user signed out, let the user sign in again or sign up, then
 		# run the main menu again
-		if result == MainMenu.LOGOUT_INDEX:
+		if result == MainMenu.BACK_INDEX:
 			Main._loginAndRun(cursor)
 
 	@staticmethod
