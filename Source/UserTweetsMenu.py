@@ -41,8 +41,8 @@ class UserTweetsMenu:
 		UserTweetsMenu.BACK_INDEX
 		"""
 
-		self._resultsGenerator = TweetsTableTools.getTweetsByDate(cursor,
-			userID)
+		self._resultsGenerator = TweetsTableTools.getTweetsByDate(self._cursor,
+			self._userID)
 
 		menu = TerminalGeneratorMenu(self._resultsGenerator,
 			emptyMessage = UserTweetsMenu._EMPTY_MESSAGE)
