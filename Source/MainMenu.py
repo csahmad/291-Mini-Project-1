@@ -6,6 +6,7 @@ from TweetTools import TweetTools
 from SearchMenu import SearchMenu
 from FollowersMenu import FollowersMenu
 from ViewTweetMenu import ViewTweetMenu
+from TerminalInterface import TerminalInterface
 
 class MainMenu:
 	"""
@@ -96,6 +97,7 @@ class MainMenu:
 	def _postTweet(self):
 		"""Let the user post a tweet"""
 
+		TerminalInterface.tryClear()
 		tweetText = input("Post:")
 		hashtags = TweetTools.getHashtags(tweetText)
 		date = DateTools.getCurrentDate()
