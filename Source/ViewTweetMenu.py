@@ -2,6 +2,7 @@ from TableTools import TweetsTableTools
 from TerminalMenu import TerminalMenu
 from IDGenerator import IDGenerator
 from DateTools import DateTools
+from TerminalInterface import TerminalInterface
 
 class ViewTweetMenu:
 	"""The menu for viewing a tweet and replying to it or retweeting it"""
@@ -68,22 +69,33 @@ class ViewTweetMenu:
 
 		# If user chose to reply to the tweet, let user write reply
 		if choice == ViewTweetMenu._REPLY_INDEX:
-			replyText = input("Reply:")
-			hashtags = TweetTools.getHashtags(replyText)
-			tweet = self._tweet
-			replyTweetID = IDGenerator.getNewTweetID(self._cursor)
-			replyDate = DateTools.getCurrentDate()
-			TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
-				replyText, replyTweetID, tweet.tweetID, hashtags)
-			self._tweetStats.addReply()
+			self._reply()
 
 		# If user chose to retweet the tweet, retweet
 		elif choice == ViewTweetMenu._RETWEET_INDEX:
-			retweetDate = DateTools.getCurrentDate()
-			tweet = self._tweet
-			TweetsTableTools.retweet(cursor, tweet.tweetID, self._userID,
-				retweetDate)
-			self._isRetweetedByUser = True
-			self._tweetStats.addRetweet()
+			self._retweet()
 
 		return ViewTweetMenu._INITIAL_INDEX
+
+	def _reply(self):
+		"""Let the user reply to the tweet"""
+
+		TerminalInterface.tryClear()
+		replyText = input("Reply:")
+		hashtags = TweetTools.getHashtags(replyText)
+		tweet = self._tweet
+		replyTweetID = IDGenerator.getNewTweetID(self._cursor)
+		replyDate = DateTools.getCurrentDate()
+		TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
+			replyText, replyTweetID, tweet.tweetID, hashtags)
+		self._tweetStats.addReply()
+
+	def _retweet(self):
+		"""Retweet the tweet"""
+
+		retweetDate = DateTools.getCurrentDate()
+		tweet = self._tweet
+		TweetsTableTools.retweet(cursor, tweet.tweetID, self._userID,
+			retweetDate)
+		self._isRetweetedByUser = True
+		self._tweetStats.addRetweet()
