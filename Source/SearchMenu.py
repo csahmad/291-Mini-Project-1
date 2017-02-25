@@ -1,6 +1,7 @@
 from TerminalMenu import TerminalMenu
 from FindTweetMenu import FindTweetMenu
 from FindUserMenu import FindUserMenu
+from TerminalInterface import TerminalInterface
 
 class SearchMenu:
 	"""The menu for searching for tweets or users"""
@@ -34,7 +35,7 @@ class SearchMenu:
 		user chose the "back" option) or None (if an exit key was pressed)
 		"""
 
-		menu = TerminalMenu(["Find a tweet", "Find a user"])
+		menu = TerminalMenu(["Find a tweet", "Find a user", "Back"])
 		choice = menu.showAndGet()
 
 		# If an exit key was pressed, return None
@@ -61,12 +62,14 @@ class SearchMenu:
 	def _findTweet(self):
 		"""Let the user enter a keyword and find matching tweets"""
 
+		TerminalInterface.tryClear()
 		menu = FindTweetMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 
 	def _findUser(self):
 		"""Let the user enter a keyword and find matching users"""
 
+		TerminalInterface.tryClear()
 		menu = FindUserMenu(self._cursor, self._userID)
 		return menu.showAndGet()
 
