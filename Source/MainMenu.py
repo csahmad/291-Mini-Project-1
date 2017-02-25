@@ -71,7 +71,7 @@ class MainMenu:
 			if result is None: return None        # If an exit key was pressed
 
 		# If the exit option was chosen, return None
-		elif choice == MainMenu._EXIT_INDEX:
+		elif choice == MainMenu.EXIT_INDEX:
 			return None
 
 		# If user chose to post a tweet, let the user post a tweet
