@@ -133,9 +133,6 @@ class TerminalGeneratorMenu:
 		seeMoreIndex = TerminalGeneratorMenu._SEE_MORE_INDEX
 		backIndex = TerminalGeneratorMenu._BACK_INDEX
 
-		if self._exhaustedItems:
-			backIndex -= 1
-
 		if index is None: return None
 
 		count = len(self._displayedItems)
@@ -144,15 +141,22 @@ class TerminalGeneratorMenu:
 		if index < count:
 			return GeneratorMenuChoice(self._displayedItems[index])
 
-		optionIndex = count - index
+		index -= count
+
+		if self._exhaustedItems:
+			backIndex -= 1
+			optionIndex = index
+
+		else:
+			optionIndex = index - 1
 
 		# If the user chose to see more, return
 		# TerminalGeneratorMenu._SEE_MORE_INDEX
-		if not self._exhaustedItems and optionIndex == seeMoreIndex:
+		if not self._exhaustedItems and index == seeMoreIndex:
 			return seeMoreIndex
 
 		# If the user chose to go back, return a GeneratorMenuChoice
-		if optionIndex == backIndex:
+		if index == backIndex:
 			return GeneratorMenuChoice(backWasChosen = True)
 
 		# If another option was chosen, return a GeneratorMenuChoice
@@ -274,5 +278,5 @@ if __name__ == "__main__":
 
 	generator = itemGenerator()
 	options = ["Option 1", "Option 2"]
-	menu = TerminalGeneratorMenu(generator)
+	menu = TerminalGeneratorMenu(generator, otherOptions = options)
 	print(menu.showAndGet())
