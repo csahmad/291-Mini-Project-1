@@ -51,10 +51,10 @@ class ViewUserMenu:
 
 		if self._isFollowing:
 			preMessage = "You follow this user" + preMessage
-			options = _OPTIONS_WITHOUT_FOLLOW
+			options = ViewUserMenu._OPTIONS_WITHOUT_FOLLOW
 
 		else:
-			options = _OPTIONS
+			options = ViewUserMenu._OPTIONS
 
 		menu = TerminalMenu(options, preMessage)
 		choice = menu.showAndGet()
