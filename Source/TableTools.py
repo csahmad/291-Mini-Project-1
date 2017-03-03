@@ -97,23 +97,6 @@ class TableTools:
 			result = cursor.fetchone()
 
 	@staticmethod
-	def yieldRankedResults(cursor, statement, rankName = "rank"):
-		"""
-		Yield each result of the given statement ordered by the value stored in
-		the column named rankName
-		"""
-
-		cursor.execute("select * from ({0}) where rank = 1".format(statement))
-		result = cursor.fetchone()
-
-		i = 1
-
-		while result is not None:
-			yield result
-			i += 1
-			result = cursor.fetchone()
-
-	@staticmethod
 	def getCount(cursor, tableName, condition = None, unique = False):
 		"""
 		Return the number of rows in the given table that match the given
@@ -275,14 +258,15 @@ class TweetsTableTools:
 
 		columns = "tid, writer, tdate, text, replyto"
 
-		rankStatement = TableTools.rankStatement("tdate")
+		select = "select {0} from {1}, {2} ".format(columns,
+			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE)
 
-		rankedSelect = "select {0}, {1} from {2}, {3} ".format(
-			columns, rankStatement, TweetsTableTools._TWEETS_TABLE,
-			TweetsTableTools._FOLLOWS_TABLE) + \
-			"where flwer = {0} and writer = flwee".format(follower)
+		where = "where flwer = {0} and writer = flwee ".format(follower)
+		orderBy = "order by tdate desc"
 
-		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+		statement = select + where + orderBy
+
+		for result in TableTools.yieldResults(cursor, statement):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
@@ -298,11 +282,14 @@ class TweetsTableTools:
 
 		columns = "tid, tdate, text, replyto"
 
-		rankStatement = TableTools.rankStatement("tdate")
-		rankedSelect = "select {0}, {1} from {2}".format(columns,
-			rankStatement, TweetsTableTools._TWEETS_TABLE)
+		select = "select {0} from {1} ".format(columns,
+			TweetsTableTools._TWEETS_TABLE)
 
-		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+		orderBy = "order by tdate desc"
+
+		statement = select + orderBy
+
+		for result in TableTools.yieldResults(cursor, statement):
 			yield Tweet(result[0], userID, result[1], result[2], result[3])
 
 class FollowsTableTools:
@@ -400,15 +387,16 @@ class UsersTableTools:
 		name length)
 		"""
 
-		rankStatement = TableTools.rankStatement("length(usr)",
-			descending = False)
+		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
 
-		like = "regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+		where = "where regexp_like (name, '{0}', 'i') ".format(
+			"|".join(keywords))
 
-		rankedSelect = "select usr, {0} from {1} where {2}".format(
-				rankStatement, UsersTableTools._USERS_TABLE, like)
+		orderBy = "order by length(usr) asc"
 
-		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+		statement = select + where + orderBy
+
+		for result in TableTools.yieldResults(cursor, statement):
 			yield result
 
 	@staticmethod
@@ -419,21 +407,20 @@ class UsersTableTools:
 		length)
 		"""
 
-		rankStatement = TableTools.rankStatement("length(city)",
-			descending = False)
+		joinedKeywords = "|".join(keywords)
 
-		cityLike = "regexp_like (city, '{0}', 'i')".format("|".join(keywords))
+		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
 
-		nameNotLike = \
-			"not regexp_like (name, '{0}', 'i')".format("|".join(keywords))
+		where1 = "where regexp_like (city, '{0}', 'i') and ".format(
+			joinedKeywords)
 
-		whereConditions = "{0} and {1}".format(cityLike, nameNotLike)
+		where2 = "not regexp_like (name, '{0}', 'i') ".format(joinedKeywords)
 
-		rankedSelect = \
-			"select usr, {0} from {1} where ".format(rankStatement,
-				UsersTableTools._USERS_TABLE) + whereConditions
+		orderBy = "order by length(city) asc"
 
-		for result in TableTools.yieldRankedResults(cursor, rankedSelect):
+		statement = select + where1 + where2 + orderBy
+
+		for result in TableTools.yieldResults(cursor, statement):
 			yield result
 
 	@staticmethod
