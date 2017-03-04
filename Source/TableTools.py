@@ -51,9 +51,8 @@ class TableTools:
 
 		variables = {"value": item}
 
-		cursor.execute(
-			"select unique {0} from {1} where {0} = :value".format(columnName,
-				tableName), variables)
+		cursor.execute("select {0} from {1} where {0} = :value".format(
+			columnName, tableName), variables)
 
 		result = cursor.fetchone()
 
