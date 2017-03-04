@@ -7,27 +7,29 @@ class UsersMenu:
 	BACK_INDEX = 0
 	_INITIAL_INDEX = -1
 
-	def __init__(self, cursor, userID, userIDGenerator, preMessage = None,
+	def __init__(self, cursor, userID, preMessage = None,
 		emptyMessage = "No users"):
 		"""
 		Arguments:
 		userID -- the user ID of the signed in user
-		userIDGenerator -- a generator that yields user IDs
 		preMessage -- the message to show before the listed users
 		empytMessage -- the message to display if the generator yields nothing
 		"""
 
 		self._cursor = cursor
 		self._userID = userID
-		self._userIDGenerator = userIDGenerator
 		self._preMessage = preMessage
 		self._emptyMessage = emptyMessage
+		self._menu = None
 
-	def showAndGet(self):
+	def showAndGet(self, userIDGenerator):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
 		UsersMenu.BACK_INDEX
 		"""
+
+		self._menu = TerminalGeneratorMenu(userIDGenerator,
+			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
 
 		choice = UsersMenu._INITIAL_INDEX
 
@@ -42,10 +44,7 @@ class UsersMenu:
 		UsersMenu.BACK_INDEX
 		"""
 
-		menu = TerminalGeneratorMenu(self._userIDGenerator,
-			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
-
-		result = menu.showAndGet()
+		result = self._menu.showAndGet()
 
 		# If an exit key was pressed, return None
 		if result is None: return None

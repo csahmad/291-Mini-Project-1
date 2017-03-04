@@ -21,10 +21,10 @@ class FollowersMenu:
 		userIDGenerator = FollowsTableTools.getFollowers(self._cursor,
 			self._userID)
 
-		menu = UsersMenu(self._cursor, self._userID, userIDGenerator,
+		menu = UsersMenu(self._cursor, self._userID,
 			emptyMessage = FollowersMenu._EMPTY_MESSAGE)
 
-		choice = menu.showAndGet()
+		choice = menu.showAndGet(userIDGenerator)
 
 		if choice == UsersMenu.BACK_INDEX:
 			return FollowersMenu.BACK_INDEX

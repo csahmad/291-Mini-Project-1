@@ -28,10 +28,10 @@ class FindUserMenu:
 		userIDGenerator = UsersTableTools.findUsers(self._cursor,
 			re.split("\s|\s*,\s*", keywords))
 
-		menu = UsersMenu(self._cursor, self._userID, userIDGenerator,
+		menu = UsersMenu(self._cursor, self._userID,
 			emptyMessage = FindUserMenu._EMPTY_MESSAGE)
 
-		choice = menu.showAndGet()
+		choice = menu.showAndGet(userIDGenerator)
 
 		if choice == UsersMenu.BACK_INDEX:
 			return FindUserMenu.BACK_INDEX
