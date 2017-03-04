@@ -1,5 +1,3 @@
-import re
-
 from TableTools import UsersTableTools
 from UsersMenu import UsersMenu
 from TerminalInterface import TerminalInterface
@@ -25,14 +23,13 @@ class FindUserMenu:
 		FindUserMenu.BACK_INDEX
 		"""
 
-		keywords = input("Enter keywords:")
+		keywords = TerminalInterface.getSearchKeywords()
 
-		if keywords == "":
-			TerminalInterface.alert("Empty search dismissed")
-			return FindUserMenu.BACK_INDEX
+		# If user did not enter any keywords, return FindUserMenu.BACK_INDEX
+		if keywords is None: return FindUserMenu.BACK_INDEX
 
 		userGeneratorMethod = lambda: UsersTableTools.findUsers(
-			self._connection, re.split("\s|\s*,\s*", keywords))
+			self._connection, keywords)
 
 		menu = UsersMenu(self._connection, self._userID, userGeneratorMethod,
 			emptyMessage = FindUserMenu._EMPTY_MESSAGE)

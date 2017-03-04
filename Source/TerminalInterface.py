@@ -1,4 +1,5 @@
 import os
+import re
 from getpass import getpass
 
 from Constants import Constants
@@ -6,6 +7,37 @@ from CheckStringFormat import CheckStringFormat
 
 class TerminalInterface:
 	"""Static methods for implementing a terminal interface"""
+
+	@staticmethod
+	def getSearchKeywords():
+		"""
+		Prompt the user for a string of keywords, split the string by space
+		and/or comma and return the result
+
+		If the entered string is empty, alert the user that the search was
+		dismissed and return None
+		"""
+
+		keywords = TerminalInterface.getKeywords()
+
+		if keywords is None:
+			TerminalInterface.alert("Empty search dismissed")
+			return None
+
+		return keywords
+
+	@staticmethod
+	def getKeywords():
+		"""
+		Prompt the user for a string of keywords, split the string by space
+		and/or comma and return the result
+
+		If the entered string is empty, return None
+		"""
+
+		keywordString = input("Enter keywords:")
+		if keywordString == "": return None
+		return re.split("\s|\s*,\s*", keywordString)
 
 	@staticmethod
 	def alert(message, prompt = "\n(Press Enter to continue)"):
