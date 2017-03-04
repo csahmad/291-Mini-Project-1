@@ -1,3 +1,43 @@
+class User:
+	"""Represents a user"""
+
+	def __init__(self, userID, name, email, city, timezone):
+
+		self._userID = userID
+		self._name = name
+		self._email = email
+		self._city = city
+		self._timezone = timezone
+
+	def __str__(self):
+
+		return "[{0}] {1}".format(self._userID, self._name)
+
+	@property
+	def userID(self):
+
+		return self._userID
+
+	@property
+	def name(self):
+
+		return self._name
+
+	@property
+	def email(self):
+
+		return self._email
+
+	@property
+	def city(self):
+
+		return self._city
+
+	@property
+	def timezone(self):
+
+		return self._timezone
+
 class UserStats:
 	"""Contains stats for a user"""
 

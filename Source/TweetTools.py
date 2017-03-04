@@ -17,7 +17,6 @@ class Tweet:
 
 	def __init__(self, tweetID, writer, date, text, replyTo = None):
 
-		if replyTo == "null": replyTo = None
 		self._tweetID = tweetID
 		self._writer = writer
 		self._date = date
@@ -32,8 +31,8 @@ class Tweet:
 		else:
 			replyToString = "@{0} ".format(self._replyTo)
 
-		return "{0}: {1}{2} ({3})".format(self._writer, replyToString,
-			self._text, self._date)
+		return "[{0}] {1}: {2}{3} ({4})".format(self._tweetID, self._writer,
+			replyToString, self._text, self._date)
 
 	@property
 	def tweetID(self):
