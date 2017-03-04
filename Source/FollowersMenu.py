@@ -27,10 +27,11 @@ class FollowersMenu:
 
 		choice = menu.showAndGet()
 
-		if choice == UsersMenu.BACK_INDEX:
-			return FollowersMenu.BACK_INDEX
+		# If an exit key was pressed, return None
+		if choice is None: return None
 
-		return choice
+		# If user chose back option, return FollowersMenu.BACK_INDEX
+		return FollowersMenu.BACK_INDEX
 
 # Interactive test
 if __name__ == "__main__":
