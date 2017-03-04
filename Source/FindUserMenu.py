@@ -2,6 +2,7 @@ import re
 
 from TableTools import UsersTableTools
 from UsersMenu import UsersMenu
+from TerminalInterface import TerminalInterface
 
 class FindUserMenu:
 	"""Interface for searching for a user"""
@@ -25,6 +26,10 @@ class FindUserMenu:
 		"""
 
 		keywords = input("Enter keywords:")
+
+		if keywords == "":
+			TerminalInterface.alert("Empty search dismissed")
+			return FindUserMenu.BACK_INDEX
 
 		userGeneratorMethod = lambda: UsersTableTools.findUsers(
 			self._connection, re.split("\s|\s*,\s*", keywords))

@@ -2,6 +2,7 @@ import re
 
 from TableTools import TweetsTableTools
 from TweetsMenu import TweetsMenu
+from TerminalInterface import TerminalInterface
 
 class FindTweetMenu:
 	"""Interface for searching for a tweet"""
@@ -25,6 +26,10 @@ class FindTweetMenu:
 		"""
 
 		keywords = input("Enter keywords:")
+
+		if keywords == "":
+			TerminalInterface.alert("Empty search dismissed")
+			return FindTweetMenu.BACK_INDEX
 
 		tweetGeneratorMethod = lambda: TweetsTableTools.findTweets(
 			self._connection, re.split("\s|\s*,\s*", keywords))
