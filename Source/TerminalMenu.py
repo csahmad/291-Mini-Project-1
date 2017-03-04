@@ -153,7 +153,7 @@ class TerminalGeneratorMenu:
 		# If the user chose to see more, return
 		# TerminalGeneratorMenu._SEE_MORE_INDEX
 		if not self._exhaustedItems and index == seeMoreIndex:
-			return seeMoreIndex
+			return TerminalGeneratorMenu._SEE_MORE_INDEX
 
 		# If the user chose to go back, return a GeneratorMenuChoice
 		if index == backIndex:
