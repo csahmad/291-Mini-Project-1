@@ -22,13 +22,13 @@ class UsersMenu:
 		self._emptyMessage = emptyMessage
 		self._menu = None
 
-	def showAndGet(self, userIDGenerator):
+	def showAndGet(self, userGenerator):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
 		UsersMenu.BACK_INDEX
 		"""
 
-		self._menu = TerminalGeneratorMenu(userIDGenerator,
+		self._menu = TerminalGeneratorMenu(userGenerator,
 			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
 
 		choice = UsersMenu._INITIAL_INDEX

@@ -18,13 +18,13 @@ class FollowersMenu:
 		FollowersMenu.BACK_INDEX
 		"""
 
-		userIDGenerator = FollowsTableTools.getFollowers(self._cursor,
+		userGenerator = FollowsTableTools.getFollowers(self._cursor,
 			self._userID)
 
 		menu = UsersMenu(self._cursor, self._userID,
 			emptyMessage = FollowersMenu._EMPTY_MESSAGE)
 
-		choice = menu.showAndGet(userIDGenerator)
+		choice = menu.showAndGet(userGenerator)
 
 		if choice == UsersMenu.BACK_INDEX:
 			return FollowersMenu.BACK_INDEX

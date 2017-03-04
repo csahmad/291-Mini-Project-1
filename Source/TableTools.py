@@ -1,5 +1,5 @@
 from TweetTools import Tweet, TweetStats
-from UserTools import UserStats
+from UserTools import User, UserStats
 
 class TableTools:
 	"""Static methods for getting information about tables"""
@@ -289,7 +289,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(cursor, statement, variables):
-			yield result[0]
+			yield UsersTableTools.getUser(cursor, result[0])
 
 	@staticmethod
 	def getFollowing(cursor, follower):
@@ -301,7 +301,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(cursor, statement, variables):
-			yield result[0]
+			yield UsersTableTools.getUser(cursor, result[0])
 
 	@staticmethod
 	def follow(cursor, follower, followee, date):
@@ -323,6 +323,21 @@ class UsersTableTools:
 	_USERS_TABLE = "Users"
 	_FOLLOWS_TABLE = "Follows"
 	_TWEETS_TABLE = "Tweets"
+
+	@staticmethod
+	def getUser(cursor, userID):
+		"""Get a User object given a user ID"""
+
+		columns = "usr, name, email, city, timezone"
+		variables = {"userID": userID}
+
+		statement = "select {0} from {1} where usr = :userID".format(columns,
+			UsersTableTools._USERS_TABLE)
+
+		cursor.execute(statement, variables)
+		result = cursor.fetchone()
+
+		return User(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
 	def getUserStats(cursor, userID):
@@ -370,7 +385,7 @@ class UsersTableTools:
 			yield user
 
 		for user in UsersTableTools._usersByCityNotName(cursor, keyword):
-			yield user[0]
+			yield UsersTableTools.getUser(cursor, user[0])
 
 	@staticmethod
 	def findUsersByName(cursor, keywords):
@@ -388,7 +403,7 @@ class UsersTableTools:
 		statement = select + where + orderBy
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result[0]
+			yield UsersTableTools.getUser(cursor, result[0])
 
 	@staticmethod
 	def _usersByCityNotName(cursor, keywords):
