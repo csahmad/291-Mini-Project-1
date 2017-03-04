@@ -119,8 +119,51 @@ class TableTools:
 		return cursor.fetchone()[0]
 
 	@staticmethod
+	def insertMany(connection, tableName, values, inputSizes = None,
+		insertsAtOnce = 20):
+		"""
+		Insert each collection (list/tuple) in values (list/tuple) into the
+		given table
+
+		Arguments:
+		tableName -- the name of the table to insert the values into
+		values -- a collection (list/tuple) of collections (list/tuple) of
+			values, with each sub-collection entered into the table
+			For example, [("John", 22), ("Jane", 23)]
+		inputSizes -- a list/tuple with the type of each value to be inserted
+			or the maximum length of the value if the value is a string
+			For example, for the values [("Johnie", 22), ("Jane", 23)],
+			inputSizes might be (6, int)
+		insertsAtOnce -- how many insert statements to combine into one (how
+			many collections of values to insert into the table at a time)
+		"""
+
+		length = len(values)
+
+		# If values is empty (if there are no values to insert), return
+		if length == 0: return
+
+		# If there is only one set of values to enter, call TableTools.insert
+		# and return
+		if length == 1:
+			TableTools.insert(connection, tableName, values[0])
+			return
+
+		cursor = connection.cursor()
+		cursor.bindarraysize = insertsAtOnce
+
+		if inputSizes is not None:
+			cursor.setinputsizes(*inputSizes)
+
+		# Get a string of the variable names (eg. ":1, :2, :3")
+		variableNames = ", ".join([":" + str(i + 1) for i in range(length)])
+
+		cursor.executemany("insert into {0} values ({1})".format(tableName,
+			variableNames), values)
+
+	@staticmethod
 	def insert(connection, tableName, values):
-		"""Insert the given values (list) into the given table"""
+		"""Insert the given values (list/tuple) into the given table"""
 
 		cursor = connection.cursor()
 
@@ -229,13 +272,17 @@ class TweetsTableTools:
 		TableTools.insert(connection, TweetsTableTools._TWEETS_TABLE,
 			[tweetID, writer, date, text, replyTo])
 
+		mentionsValues = []
+
 		for hashtag in hashtags:
 
 			TableTools.insertItemIfNew(connection,
 				TweetsTableTools._HASHTAGS_TABLE, hashtag, "term")
 
-			TableTools.insert(connection,
-				TweetsTableTools._MENTIONS_TABLE, [tweetID, hashtag])
+			mentionsValues.append((tweetID, hashtag))
+
+		TableTools.insertMany(connection, TweetsTableTools._MENTIONS_TABLE,
+			mentionsValues, (int, 10))
 
 	@staticmethod
 	def getFolloweeTweetsByDate(connection, follower):
