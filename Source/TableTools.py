@@ -414,15 +414,18 @@ class UsersTableTools:
 		name length)
 		"""
 
-		joinedKeywords = "|".join(keywords).replace("'", "")
+		joinedKeywords = "|".join(keywords)
+		variables = {"keywords": joinedKeywords}
 
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
-		where = "where regexp_like (name, '{0}', 'i') ".format(joinedKeywords)
+		where = "where regexp_like (name, :keywords, 'i') "
 		orderBy = "order by length(usr) asc"
 
 		statement = select + where + orderBy
 
-		for result in TableTools.yieldResults(connection, statement):
+		for result in TableTools.yieldResults(connection, statement,
+			variables):
+
 			yield UsersTableTools.getUser(connection, result[0])
 
 	@staticmethod
@@ -433,20 +436,19 @@ class UsersTableTools:
 		length)
 		"""
 
-		joinedKeywords = "|".join(keywords).replace("'", "")
+		joinedKeywords = "|".join(keywords)
+		variables = {"keywords": joinedKeywords}
 
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
-
-		where1 = "where regexp_like (city, '{0}', 'i') and ".format(
-			joinedKeywords)
-
-		where2 = "not regexp_like (name, '{0}', 'i') ".format(joinedKeywords)
-
+		where1 = "where regexp_like (city, :keywords, 'i') and "
+		where2 = "not regexp_like (name, :keywords, 'i') "
 		orderBy = "order by length(city) asc"
 
 		statement = select + where1 + where2 + orderBy
 
-		for result in TableTools.yieldResults(connection, statement):
+		for result in TableTools.yieldResults(connection, statement,
+			variables):
+
 			yield result[0]
 
 	@staticmethod
