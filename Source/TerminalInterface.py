@@ -8,6 +8,16 @@ class TerminalInterface:
 	"""Static methods for implementing a terminal interface"""
 
 	@staticmethod
+	def alert(message, prompt = "\n(Press Enter to continue)"):
+		"""
+		Clear the terminal, display the given message, and wait for the user to
+		press Enter
+		"""
+
+		TerminalInterface.tryClear()
+		input(message + prompt)
+
+	@staticmethod
 	def login(usernamePrompt = "username:", passwordPrompt = "password:",
 		integerUsername = False):
 		"""

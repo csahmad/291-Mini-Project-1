@@ -30,15 +30,12 @@ class OracleTerminalConnection:
 
 		# On error, show error message and prompt user to press enter to retry
 		except cx_Oracle.DatabaseError as error:
-			TerminalInterface.tryClear()
-			print("Could not connect (press enter to retry)")
-			print("\n")
-			print("Connection string:")
-			print(Constants.CONNECTION_STRING)
-			print("\n")
-			print("Error:")
-			print(error)
-			input("")
+
+			message = "Could not connect\n\n"
+			error = "Error:\n{0}\n\n".format(error)
+			prompt = "(Press Enter to retry)"
+
+			TerminalInterface.alert(message + error, prompt)
 			return OracleTerminalConnection.connect()
 
 if __name__ == "__main__":

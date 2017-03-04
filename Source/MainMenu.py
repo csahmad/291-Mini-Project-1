@@ -99,6 +99,11 @@ class MainMenu:
 
 		TerminalInterface.tryClear()
 		tweetText = input("Post:")
+
+		if tweetText == "":
+			TerminalInterface.alert("Empty tweet discarded")
+			return
+
 		hashtags = TweetTools.getHashtags(tweetText)
 		date = DateTools.getCurrentDate()
 		tweetID = IDGenerator.getNewTweetID(self._connection)
