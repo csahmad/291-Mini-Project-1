@@ -1,8 +1,50 @@
+import cx_Oracle
+
 from TweetTools import Tweet, TweetStats
 from UserTools import User, UserStats
 
 class TableTools:
 	"""Static methods for getting information about tables"""
+
+	@staticmethod
+	def stringsToFixedChars(cursor, inputSizes):
+		"""
+		For the given inputSizes, convert each integer (representing the
+		maximum length of a cx_Oracle.STRING variable) into a
+		cx_Oracle.FIXED_CHAR variable type with the length of the integer
+
+		Arguments:
+		inputSizes -- the inputSizes to convert, in the same format as
+			arguments passed to Cursor.setinputsizes
+			Can be a list (not tuple) or dictionary
+		"""
+
+		if isinstance(inputSizes, dict):
+
+			for key, value in inputSizes.items():
+
+				if isinstance(value, int):
+					inputSizes[key] = TableTools.intToFixedChar(cursor, value)
+
+		else:
+
+			length = len(inputSizes)
+
+			for i in range(length):
+
+				if isinstance(inputSizes[i], int):
+
+					inputSizes[i] = TableTools.intToFixedChar(cursor,
+						inputSizes[i])
+
+	@staticmethod
+	def intToFixedChar(cursor, integer):
+		"""
+		Return a cx_Oracle.FIXED_CHAR variable type with the length of the
+		given integer
+		"""
+
+		return cursor.var(cx_Oracle.FIXED_CHAR, integer)
 
 	@staticmethod
 	def exists(connection, tableName, columnValues):
