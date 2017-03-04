@@ -85,6 +85,11 @@ class ViewTweetMenu:
 
 		TerminalInterface.tryClear()
 		replyText = input("Reply:")
+
+		if replyText == "":
+			TerminalInterface.alert("Empty tweet discarded")
+			return
+
 		hashtags = TweetTools.getHashtags(replyText)
 		tweet = self._tweet
 		replyTweetID = IDGenerator.getNewTweetID(self._connection)
