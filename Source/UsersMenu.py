@@ -7,29 +7,29 @@ class UsersMenu:
 	BACK_INDEX = 0
 	_INITIAL_INDEX = -1
 
-	def __init__(self, connection, userID, preMessage = None,
-		emptyMessage = "No users"):
+	def __init__(self, connection, userID, userGeneratorMethod,
+		preMessage = None, emptyMessage = "No users"):
 		"""
 		Arguments:
 		userID -- the user ID of the signed in user
+		userGeneratorMethod -- the method to call to get the User generator as
+			a lambda with arguments
 		preMessage -- the message to show before the listed users
 		empytMessage -- the message to display if the generator yields nothing
 		"""
 
 		self._connection = connection
 		self._userID = userID
+		self._userGeneratorMethod = userGeneratorMethod
 		self._preMessage = preMessage
 		self._emptyMessage = emptyMessage
 		self._menu = None
 
-	def showAndGet(self, userGenerator):
+	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
 		UsersMenu.BACK_INDEX
 		"""
-
-		self._menu = TerminalGeneratorMenu(userGenerator,
-			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
 
 		choice = UsersMenu._INITIAL_INDEX
 
@@ -44,7 +44,12 @@ class UsersMenu:
 		UsersMenu.BACK_INDEX
 		"""
 
-		result = self._menu.showAndGet()
+		userGenerator = self._userGeneratorMethod()
+
+		menu = TerminalGeneratorMenu(userGenerator,
+			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
+
+		result = menu.showAndGet()
 
 		# If an exit key was pressed, return None
 		if result is None: return None

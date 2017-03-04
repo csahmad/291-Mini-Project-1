@@ -25,10 +25,11 @@ class FindTweetMenu:
 		"""
 
 		keywords = input("Enter keywords:")
-		tweetGenerator = TweetsTableTools.findTweets(self._connection,
-			re.split("\s|\s*,\s*", keywords))
 
-		menu = TweetsMenu(self._connection, self._userID, tweetGenerator,
+		tweetGeneratorMethod = lambda: TweetsTableTools.findTweets(
+			self._connection, re.split("\s|\s*,\s*", keywords))
+
+		menu = TweetsMenu(self._connection, self._userID, tweetGeneratorMethod,
 			emptyMessage = FindTweetMenu._EMPTY_MESSAGE)
 
 		choice = menu.showAndGet()

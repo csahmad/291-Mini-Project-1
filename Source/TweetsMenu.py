@@ -7,19 +7,20 @@ class TweetsMenu:
 	BACK_INDEX = 0
 	_INITIAL_INDEX = -1
 
-	def __init__(self, connection, userID, tweetGenerator, preMessage = None,
-		emptyMessage = "No tweets"):
+	def __init__(self, connection, userID, tweetGeneratorMethod,
+		preMessage = None, emptyMessage = "No tweets"):
 		"""
 		Arguments:
 		userID -- the user ID of the signed in user
-		tweetGenerator -- a generator that yields Tweet objects
+		tweetGeneratorMethod -- the method to call to get the tweet generator
+			as a lambda with arguments
 		preMessage -- the message to show before the listed tweets
 		empytMessage -- the message to display if the generator yields nothing
 		"""
 
 		self._connection = connection
 		self._userID = userID
-		self._tweetGenerator = tweetGenerator
+		self._tweetGeneratorMethod = tweetGeneratorMethod
 		self._preMessage = preMessage
 		self._emptyMessage = emptyMessage
 
@@ -42,7 +43,9 @@ class TweetsMenu:
 		TweetsMenu.BACK_INDEX
 		"""
 
-		menu = TerminalGeneratorMenu(self._tweetGenerator,
+		tweetGenerator = self._tweetGeneratorMethod()
+
+		menu = TerminalGeneratorMenu(tweetGenerator,
 			preMessage = self._preMessage, emptyMessage = self._emptyMessage)
 
 		result = menu.showAndGet()

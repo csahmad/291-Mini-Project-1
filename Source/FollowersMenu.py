@@ -12,19 +12,20 @@ class FollowersMenu:
 		self._connection = connection
 		self._userID = userID
 
+		self._userGeneratorMethod = lambda: FollowsTableTools.getFollowers(
+			self._connection, self._userID)
+
 	def showAndGet(self):
 		"""
 		Show the menu and return either None (if an exit key was pressed) or
 		FollowersMenu.BACK_INDEX
 		"""
 
-		userGenerator = FollowsTableTools.getFollowers(self._connection,
-			self._userID)
-
 		menu = UsersMenu(self._connection, self._userID,
+			self._userGeneratorMethod,
 			emptyMessage = FollowersMenu._EMPTY_MESSAGE)
 
-		choice = menu.showAndGet(userGenerator)
+		choice = menu.showAndGet()
 
 		if choice == UsersMenu.BACK_INDEX:
 			return FollowersMenu.BACK_INDEX
