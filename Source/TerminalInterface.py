@@ -32,6 +32,7 @@ class TerminalInterface:
 				print("Must be an integer")
 				username = input(usernamePrompt)
 
+		TerminalInterface.tryClear()
 		password = getpass(passwordPrompt)
 
 		return (username, password)

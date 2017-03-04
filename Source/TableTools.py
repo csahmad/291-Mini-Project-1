@@ -9,44 +9,47 @@ class TableTools:
 		"""
 		Return whether the given column values exist in the given table
 
-		Replaces None values with "null"
-		Does not add quotation marks to strings
-
 		Arguments:
 		tableName -- the name of the table to check
 		columnValues -- a dictionary in the format {columnName: value}
 		"""
 
+		variables = {}
 		whereConditions = []
 
+		i = 0
+
 		for column, value in columnValues.items():
-			if value is None: value = "null"
-			whereConditions.append("{0} = {1}".format(column, value))
+			valueString = "value{0}".format(i)
+			variableName = ":" + valueString
+			variables[valueString] = value
+			whereConditions.append("{0} = {1}".format(column, variableName))
+			i += 1
 
-		whereString = "where " + " and ".join(whereConditions)
+		whereString = " and ".join(whereConditions)
 
-		statement = "select unique * from {0} ".format(
-			tableName) + whereString
+		statement = "select unique * from {0} where {1}".format(tableName,
+			whereString)
 
-		cursor.execute(statement)
-
+		cursor.execute(statement, variables)
 		result = cursor.fetchone()
 
 		if result is None: return False
 		return True
 
 	@staticmethod
-	def itemExists(cursor, tableName, item, columnName = None):
+	def itemExists(cursor, tableName, item, columnName):
 		"""
 		Return whether the given value exists in the given table
 
 		If no column name given, assume table only has one column
-		Does not add quotation marks if item is a string
 		"""
 
+		variables = {"value": item}
+
 		cursor.execute(
-			"select unique {1} from {0} where {1} = {2}".format(
-				tableName, columnName, item))
+			"select unique {0} from {1} where {0} = :value".format(columnName,
+				tableName), variables)
 
 		result = cursor.fetchone()
 
@@ -54,42 +57,15 @@ class TableTools:
 		return True
 
 	@staticmethod
-	def addQuotes(stringValue):
-		"""
-		Add single quotes around the given string value and return
-
-		Return None if None given
-		"""
-
-		if stringValue is None: return None
-		return "'{0}'".format(stringValue)
-
-	@staticmethod
-	def replaceWithNull(string):
-		"""If None passed, return 'null', otherwise return string"""
-
-		if string is None: return "null"
-		return string
-
-	@staticmethod
-	def rankStatement(over, descending = True,
-		statementName = "rank"):
-		"""Return a rank() over statement"""
-
-		if descending:
-			order = "desc"
-
-		else:
-			order = "asc"
-
-		return "rank() over(order by {0} {1}) {2}".format(over, order,
-			statementName)
-
-	@staticmethod
-	def yieldResults(cursor, statement):
+	def yieldResults(cursor, statement, variables = None):
 		"""Yield each result of the given statement"""
 
-		cursor.execute(statement)
+		if variables is None:
+			cursor.execute(statement)
+
+		else:
+			cursor.execute(statement, variables)
+
 		result = cursor.fetchone()
 
 		while result is not None:
@@ -97,7 +73,8 @@ class TableTools:
 			result = cursor.fetchone()
 
 	@staticmethod
-	def getCount(cursor, tableName, condition = None, unique = False):
+	def getCount(cursor, tableName, condition = None, variables = None,
+		unique = False):
 		"""
 		Return the number of rows in the given table that match the given
 		condition
@@ -116,47 +93,58 @@ class TableTools:
 			end = ""
 
 		else:
+
+			if variables is None:
+				raise ValueError(
+					"Cannot provide a condition without providing variables.")
+
 			end = " where {0}".format(condition)
 
-		cursor.execute(start + end)
+		statement = start + end
+
+		if variables is None:
+			cursor.execute(statement)
+
+		else:
+			cursor.execute(statement, variables)
+
 		return cursor.fetchone()[0]
 
 	@staticmethod
 	def insert(cursor, tableName, values):
-		"""
-		Insert the given values (list) into the given table
+		"""Insert the given values (list) into the given table"""
 
-		Replaces None with "null"
-		Does not add quotation marks to strings
-		"""
+		variables = {}
+		variableNames = []
 
 		for i in range(len(values)):
-			if values[i] is None: values[i] = "null"
-			values[i] = str(values[i])
+			valueString = "value{0}".format(i)
+			variableNames.append(":" + valueString)
+			variables[valueString] = values[i]
+
+		variableString = ", ".join(variableNames)
 
 		cursor.execute("insert into {0} values ({1})".format(tableName,
-			", ".join(values)))
+			variableString), variables)
 
 	@staticmethod
 	def insertItem(cursor, tableName, value):
-		"""
-		Insert the given value into the given one-column table
+		"""Insert the given value into the given one-column table"""
 
-		Does not add quotation marks if the given value is a string
-		"""
+		variables = {"value": value}
 
-		cursor.execute("insert into {0} values ({1})".format(tableName, value))
+		cursor.execute("insert into {0} values (:value)".format(tableName),
+			variables)
 
 	@staticmethod
-	def insertItemIfNew(cursor, tableName, value):
+	def insertItemIfNew(cursor, tableName, value, columnName):
 		"""
 		Insert the given value into the given one-column table if the item does
 		not yet exist in the table
 
-		Does not add quotation marks if the given value is a string
 		"""
 
-		if not TableTools.itemExists(cursor, tableName, value):
+		if not TableTools.itemExists(cursor, tableName, value, columnName):
 			TableTools.insertItem(cursor, tableName, value)
 
 class TweetsTableTools:
@@ -203,15 +191,19 @@ class TweetsTableTools:
 	def getRetweetCount(cursor, tweetID):
 		"""Return the number of retweets the tweet with the given ID has"""
 
+		variables = {"tweetID": tweetID}
+
 		return TableTools.getCount(cursor, TweetsTableTools._RETWEETS_TABLE,
-			"tid = {0}".format(tweetID))
+			"tid = :tweetID", variables)
 
 	@staticmethod
 	def getReplyCount(cursor, tweetID):
 		"""Return the number of replies to the tweet with the given ID"""
 
+		variables = {"tweetID": tweetID}
+
 		return TableTools.getCount(cursor, TweetsTableTools._TWEETS_TABLE,
-			"replyto = {0}".format(tweetID))
+			"replyto = :tweetID", variables)
 
 	@staticmethod
 	def addTweet(cursor, writer, date, text, tweetID, replyTo = None,
@@ -222,27 +214,16 @@ class TweetsTableTools:
 		The given hashtags should not contain the "#" at the beginning
 		"""
 
-		# Add quotation marks to text
-		text = TableTools.addQuotes(text)
-
-		# Replace None with "null"
-		writer = TableTools.replaceWithNull(writer)
-		date = TableTools.replaceWithNull(date)
-		text = TableTools.replaceWithNull(text)
-		replyTo = TableTools.replaceWithNull(replyTo)
-
 		TableTools.insert(cursor, TweetsTableTools._TWEETS_TABLE,
 			[tweetID, writer, date, text, replyTo])
 
 		for hashtag in hashtags:
 
-			hashtag = "'{0}'".format(hashtag)
-
 			TableTools.insertItemIfNew(cursor,
-				TweetsTableTools._HASHTAGS_TABLE, hashtag)
+				TweetsTableTools._HASHTAGS_TABLE, hashtag, "term")
 
 			TableTools.insert(cursor,
-				TweetsTableTools._MENTIONS_TABLE, tweetID, hashtag)
+				TweetsTableTools._MENTIONS_TABLE, [tweetID, hashtag])
 
 	@staticmethod
 	def getFolloweeTweetsByDate(cursor, follower):
@@ -257,16 +238,17 @@ class TweetsTableTools:
 		"""
 
 		columns = "tid, writer, tdate, text, replyto"
+		variables = {"follower": follower}
 
 		select = "select {0} from {1}, {2} ".format(columns,
 			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE)
 
-		where = "where flwer = {0} and writer = flwee ".format(follower)
+		where = "where flwer = :follower and writer = flwee "
 		orderBy = "order by tdate desc"
 
 		statement = select + where + orderBy
 
-		for result in TableTools.yieldResults(cursor, statement):
+		for result in TableTools.yieldResults(cursor, statement, variables):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
@@ -301,20 +283,24 @@ class FollowsTableTools:
 	def getFollowers(cursor, followee):
 		"""Yield the user ID for each person following followee"""
 
-		statement = "select flwer from {0} where flwee = '{1}'".format(
-			FollowsTableTools._FOLLOWS_TABLE, followee)
+		variables = {"followee": followee}
 
-		for result in TableTools.yieldResults(cursor, statement):
+		statement = "select flwer from {0} where flwee = :followee".format(
+			FollowsTableTools._FOLLOWS_TABLE)
+
+		for result in TableTools.yieldResults(cursor, statement, variables):
 			yield result[0]
 
 	@staticmethod
 	def getFollowing(cursor, follower):
 		"""Yield the user ID for each person being followed by follower"""
 
-		statement = "select flwee from {0} where flwer = '{1}'".format(
-			FollowsTableTools._FOLLOWS_TABLE, follower)
+		variables = {"follower": follower}
 
-		for result in TableTools.yieldResults(cursor, statement):
+		statement = "select flwee from {0} where flwer = :follower".format(
+			FollowsTableTools._FOLLOWS_TABLE)
+
+		for result in TableTools.yieldResults(cursor, statement, variables):
 			yield result[0]
 
 	@staticmethod
@@ -350,22 +336,28 @@ class UsersTableTools:
 	def getTweetCount(cursor, userID):
 		"""Return the number of tweets from the given user"""
 
+		variables = {"userID": userID}
+
 		return TableTools.getCount(cursor, UsersTableTools._TWEETS_TABLE,
-			"writer = {0}".format(userID))
+			"writer = :userID", variables)
 
 	@staticmethod
 	def getFollowingCount(cursor, userID):
 		"""Return the number of people this user is following"""
 
+		variables = {"userID": userID}
+
 		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
-			"flwer = {0}".format(userID))
+			"flwer = :userID", variables)
 
 	@staticmethod
 	def getFollowerCount(cursor, userID):
 		"""Return the number of people following this user"""
 
+		variables = {"userID": userID}
+
 		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
-			"flwee = {0}".format(userID))
+			"flwee = :userID", variables)
 
 	@staticmethod
 	def findUsers(cursor, keyword):
@@ -378,7 +370,7 @@ class UsersTableTools:
 			yield user
 
 		for user in UsersTableTools._usersByCityNotName(cursor, keyword):
-			yield user
+			yield user[0]
 
 	@staticmethod
 	def findUsersByName(cursor, keywords):
@@ -387,17 +379,16 @@ class UsersTableTools:
 		name length)
 		"""
 
+		joinedKeywords = "|".join(keywords).replace("'", "")
+
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
-
-		where = "where regexp_like (name, '{0}', 'i') ".format(
-			"|".join(keywords))
-
+		where = "where regexp_like (name, '{0}', 'i') ".format(joinedKeywords)
 		orderBy = "order by length(usr) asc"
 
 		statement = select + where + orderBy
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def _usersByCityNotName(cursor, keywords):
@@ -407,7 +398,7 @@ class UsersTableTools:
 		length)
 		"""
 
-		joinedKeywords = "|".join(keywords)
+		joinedKeywords = "|".join(keywords).replace("'", "")
 
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
 
@@ -421,24 +412,11 @@ class UsersTableTools:
 		statement = select + where1 + where2 + orderBy
 
 		for result in TableTools.yieldResults(cursor, statement):
-			yield result
+			yield result[0]
 
 	@staticmethod
 	def addUser(cursor, password, name, email, city, timezone, userID):
 		"""Add a new user"""
-
-		# Add quotation marks to string values
-		password = TableTools.addQuotes(password)
-		name = TableTools.addQuotes(name)
-		email = TableTools.addQuotes(email)
-		city = TableTools.addQuotes(city)
-
-		# Replace None with "null"
-		password = TableTools.replaceWithNull(password)
-		name = TableTools.replaceWithNull(name)
-		email = TableTools.replaceWithNull(email)
-		city = TableTools.replaceWithNull(city)
-		timezone = TableTools.replaceWithNull(timezone)
 
 		TableTools.insert(cursor, UsersTableTools._USERS_TABLE,
 			[userID, password, name, email, city, timezone])
@@ -454,10 +432,14 @@ class UsersTableTools:
 	def loginExists(cursor, userID, password):
 		"""Return whether the given username, password combination exists"""
 
-		cursor.execute(
-		"select usr, pwd from {0} where usr = {1} and pwd = '{2}'".format(
-			UsersTableTools._USERS_TABLE, userID, password))
+		variables = {"userID": userID, "password": password}
 
+		select = "select usr, pwd from {0} ".format(
+			UsersTableTools._USERS_TABLE)
+
+		where = "where usr = :userID and pwd = :password"
+
+		cursor.execute(select + where, variables)
 		result = cursor.fetchone()
 
 		if result is None: return False

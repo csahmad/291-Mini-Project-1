@@ -50,7 +50,7 @@ class ViewUserMenu:
 		preMessage = str(self._userID) + "\n\t" + str(self._userStats)
 
 		if self._isFollowing:
-			preMessage = "You follow this user" + preMessage
+			preMessage = "You follow this user\n" + preMessage
 			options = ViewUserMenu._OPTIONS_WITHOUT_FOLLOW
 
 		else:
