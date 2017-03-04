@@ -5,7 +5,7 @@ class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
-	def exists(cursor, tableName, columnValues):
+	def exists(connection, tableName, columnValues):
 		"""
 		Return whether the given column values exist in the given table
 
@@ -13,6 +13,8 @@ class TableTools:
 		tableName -- the name of the table to check
 		columnValues -- a dictionary in the format {columnName: value}
 		"""
+
+		cursor = connection.cursor()
 
 		variables = {}
 		whereConditions = []
@@ -38,12 +40,14 @@ class TableTools:
 		return True
 
 	@staticmethod
-	def itemExists(cursor, tableName, item, columnName):
+	def itemExists(connection, tableName, item, columnName):
 		"""
 		Return whether the given value exists in the given table
 
 		If no column name given, assume table only has one column
 		"""
+
+		cursor = connection.cursor()
 
 		variables = {"value": item}
 
@@ -57,8 +61,10 @@ class TableTools:
 		return True
 
 	@staticmethod
-	def yieldResults(cursor, statement, variables = None):
+	def yieldResults(connection, statement, variables = None):
 		"""Yield each result of the given statement"""
+
+		cursor = connection.cursor()
 
 		if variables is None:
 			cursor.execute(statement)
@@ -73,7 +79,7 @@ class TableTools:
 			result = cursor.fetchone()
 
 	@staticmethod
-	def getCount(cursor, tableName, condition = None, variables = None,
+	def getCount(connection, tableName, condition = None, variables = None,
 		unique = False):
 		"""
 		Return the number of rows in the given table that match the given
@@ -82,6 +88,8 @@ class TableTools:
 		Return the total number of rows if no condition given
 		Do not include the "where" keyword in condition
 		"""
+
+		cursor = connection.cursor()
 
 		if unique:
 			start = "select unique count(*) from {0}".format(tableName)
@@ -111,8 +119,10 @@ class TableTools:
 		return cursor.fetchone()[0]
 
 	@staticmethod
-	def insert(cursor, tableName, values):
+	def insert(connection, tableName, values):
 		"""Insert the given values (list) into the given table"""
+
+		cursor = connection.cursor()
 
 		variables = {}
 		variableNames = []
@@ -128,8 +138,10 @@ class TableTools:
 			variableString), variables)
 
 	@staticmethod
-	def insertItem(cursor, tableName, value):
+	def insertItem(connection, tableName, value):
 		"""Insert the given value into the given one-column table"""
+
+		cursor = connection.cursor()
 
 		variables = {"value": value}
 
@@ -137,15 +149,14 @@ class TableTools:
 			variables)
 
 	@staticmethod
-	def insertItemIfNew(cursor, tableName, value, columnName):
+	def insertItemIfNew(connection, tableName, value, columnName):
 		"""
 		Insert the given value into the given one-column table if the item does
 		not yet exist in the table
-
 		"""
 
-		if not TableTools.itemExists(cursor, tableName, value, columnName):
-			TableTools.insertItem(cursor, tableName, value)
+		if not TableTools.itemExists(connection, tableName, value, columnName):
+			TableTools.insertItem(connection, tableName, value)
 
 class TweetsTableTools:
 	"""Tools for working with tweets"""
@@ -157,7 +168,7 @@ class TweetsTableTools:
 	_RETWEETS_TABLE = "Retweets"
 
 	@staticmethod
-	def findTweets(cursor, keywords):
+	def findTweets(connection, keywords):
 		"""
 		Find tweets that contain any of the given keywords
 
@@ -167,46 +178,47 @@ class TweetsTableTools:
 		pass
 
 	@staticmethod
-	def retweet(cursor, tweetID, userID, date):
+	def retweet(connection, tweetID, userID, date):
 		"""Add a retweet to the 'Retweets' table"""
 
-		TableTools.insert(cursor, TweetsTableTools._RETWEETS_TABLE,
+		TableTools.insert(connection, TweetsTableTools._RETWEETS_TABLE,
 			[userID, tweetID, date])
 
 	@staticmethod
-	def isRetweetedByUser(cursor, tweetID, userID):
+	def isRetweetedByUser(connection, tweetID, userID):
 		"""Return whether the given tweet was retweeted by the given user"""
 
-		return TableTools.exists(cursor, TweetsTableTools._RETWEETS_TABLE,
+		return TableTools.exists(connection, TweetsTableTools._RETWEETS_TABLE,
 			{"tid": tweetID, "usr": userID})
 
 	@staticmethod
-	def getTweetStats(cursor, tweetID):
+	def getTweetStats(connection, tweetID):
 		"""Return a TweetStats object for the tweet with the given ID"""
 
-		return TweetStats(TweetsTableTools.getRetweetCount(cursor, tweetID),
-			TweetsTableTools.getReplyCount(cursor, tweetID))
+		return TweetStats(
+			TweetsTableTools.getRetweetCount(connection, tweetID),
+			TweetsTableTools.getReplyCount(connection, tweetID))
 
 	@staticmethod
-	def getRetweetCount(cursor, tweetID):
+	def getRetweetCount(connection, tweetID):
 		"""Return the number of retweets the tweet with the given ID has"""
 
 		variables = {"tweetID": tweetID}
 
-		return TableTools.getCount(cursor, TweetsTableTools._RETWEETS_TABLE,
-			"tid = :tweetID", variables)
+		return TableTools.getCount(connection,
+			TweetsTableTools._RETWEETS_TABLE, "tid = :tweetID", variables)
 
 	@staticmethod
-	def getReplyCount(cursor, tweetID):
+	def getReplyCount(connection, tweetID):
 		"""Return the number of replies to the tweet with the given ID"""
 
 		variables = {"tweetID": tweetID}
 
-		return TableTools.getCount(cursor, TweetsTableTools._TWEETS_TABLE,
+		return TableTools.getCount(connection, TweetsTableTools._TWEETS_TABLE,
 			"replyto = :tweetID", variables)
 
 	@staticmethod
-	def addTweet(cursor, writer, date, text, tweetID, replyTo = None,
+	def addTweet(connection, writer, date, text, tweetID, replyTo = None,
 		hashtags = None):
 		"""
 		Add the given tweet to the 'Tweets' table
@@ -214,19 +226,19 @@ class TweetsTableTools:
 		The given hashtags should not contain the "#" at the beginning
 		"""
 
-		TableTools.insert(cursor, TweetsTableTools._TWEETS_TABLE,
+		TableTools.insert(connection, TweetsTableTools._TWEETS_TABLE,
 			[tweetID, writer, date, text, replyTo])
 
 		for hashtag in hashtags:
 
-			TableTools.insertItemIfNew(cursor,
+			TableTools.insertItemIfNew(connection,
 				TweetsTableTools._HASHTAGS_TABLE, hashtag, "term")
 
-			TableTools.insert(cursor,
+			TableTools.insert(connection,
 				TweetsTableTools._MENTIONS_TABLE, [tweetID, hashtag])
 
 	@staticmethod
-	def getFolloweeTweetsByDate(cursor, follower):
+	def getFolloweeTweetsByDate(connection, follower):
 		"""
 		Yield each tweet from the followees of the given user by date (recent
 		first)
@@ -248,11 +260,13 @@ class TweetsTableTools:
 
 		statement = select + where + orderBy
 
-		for result in TableTools.yieldResults(cursor, statement, variables):
+		for result in TableTools.yieldResults(connection, statement,
+			variables):
+
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
-	def getTweetsByDate(cursor, userID):
+	def getTweetsByDate(connection, userID):
 		"""
 		Yield each tweet from the given user by date (recent first)
 
@@ -271,7 +285,7 @@ class TweetsTableTools:
 
 		statement = select + orderBy
 
-		for result in TableTools.yieldResults(cursor, statement):
+		for result in TableTools.yieldResults(connection, statement):
 			yield Tweet(result[0], userID, result[1], result[2], result[3])
 
 class FollowsTableTools:
@@ -280,7 +294,7 @@ class FollowsTableTools:
 	_FOLLOWS_TABLE = "Follows"
 
 	@staticmethod
-	def getFollowers(cursor, followee):
+	def getFollowers(connection, followee):
 		"""Yield the user ID for each person following followee"""
 
 		variables = {"followee": followee}
@@ -288,11 +302,13 @@ class FollowsTableTools:
 		statement = "select flwer from {0} where flwee = :followee".format(
 			FollowsTableTools._FOLLOWS_TABLE)
 
-		for result in TableTools.yieldResults(cursor, statement, variables):
-			yield UsersTableTools.getUser(cursor, result[0])
+		for result in TableTools.yieldResults(connection, statement,
+			variables):
+
+			yield UsersTableTools.getUser(connection, result[0])
 
 	@staticmethod
-	def getFollowing(cursor, follower):
+	def getFollowing(connection, follower):
 		"""Yield the user ID for each person being followed by follower"""
 
 		variables = {"follower": follower}
@@ -300,21 +316,23 @@ class FollowsTableTools:
 		statement = "select flwee from {0} where flwer = :follower".format(
 			FollowsTableTools._FOLLOWS_TABLE)
 
-		for result in TableTools.yieldResults(cursor, statement, variables):
-			yield UsersTableTools.getUser(cursor, result[0])
+		for result in TableTools.yieldResults(connection, statement,
+			variables):
+
+			yield UsersTableTools.getUser(connection, result[0])
 
 	@staticmethod
-	def follow(cursor, follower, followee, date):
+	def follow(connection, follower, followee, date):
 		"""Make follower follow followee"""
 
-		TableTools.insert(cursor, FollowsTableTools._FOLLOWS_TABLE,
+		TableTools.insert(connection, FollowsTableTools._FOLLOWS_TABLE,
 			[follower, followee, date])
 
 	@staticmethod
-	def isFollowing(cursor, follower, followee):
+	def isFollowing(connection, follower, followee):
 		"""Return whether follower is following followee"""
 
-		return TableTools.exists(cursor, FollowsTableTools._FOLLOWS_TABLE,
+		return TableTools.exists(connection, FollowsTableTools._FOLLOWS_TABLE,
 			{"flwer": follower, "flwee": followee})
 
 class UsersTableTools:
@@ -325,8 +343,10 @@ class UsersTableTools:
 	_TWEETS_TABLE = "Tweets"
 
 	@staticmethod
-	def getUser(cursor, userID):
+	def getUser(connection, userID):
 		"""Get a User object given a user ID"""
+
+		cursor = connection.cursor()
 
 		columns = "usr, name, email, city, timezone"
 		variables = {"userID": userID}
@@ -340,55 +360,55 @@ class UsersTableTools:
 		return User(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
-	def getUserStats(cursor, userID):
+	def getUserStats(connection, userID):
 		"""Return a UserStats object for the user with the given ID"""
 
-		return UserStats(UsersTableTools.getTweetCount(cursor, userID),
-			UsersTableTools.getFollowingCount(cursor, userID),
-			UsersTableTools.getFollowerCount(cursor, userID))
+		return UserStats(UsersTableTools.getTweetCount(connection, userID),
+			UsersTableTools.getFollowingCount(connection, userID),
+			UsersTableTools.getFollowerCount(connection, userID))
 
 	@staticmethod
-	def getTweetCount(cursor, userID):
+	def getTweetCount(connection, userID):
 		"""Return the number of tweets from the given user"""
 
 		variables = {"userID": userID}
 
-		return TableTools.getCount(cursor, UsersTableTools._TWEETS_TABLE,
+		return TableTools.getCount(connection, UsersTableTools._TWEETS_TABLE,
 			"writer = :userID", variables)
 
 	@staticmethod
-	def getFollowingCount(cursor, userID):
+	def getFollowingCount(connection, userID):
 		"""Return the number of people this user is following"""
 
 		variables = {"userID": userID}
 
-		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(connection, UsersTableTools._FOLLOWS_TABLE,
 			"flwer = :userID", variables)
 
 	@staticmethod
-	def getFollowerCount(cursor, userID):
+	def getFollowerCount(connection, userID):
 		"""Return the number of people following this user"""
 
 		variables = {"userID": userID}
 
-		return TableTools.getCount(cursor, UsersTableTools._FOLLOWS_TABLE,
+		return TableTools.getCount(connection, UsersTableTools._FOLLOWS_TABLE,
 			"flwee = :userID", variables)
 
 	@staticmethod
-	def findUsers(cursor, keyword):
+	def findUsers(connection, keyword):
 		"""
 		Yield each user whose name or city contains the given keyword (yield
 		matching names first and sort by value length)
 		"""
 
-		for user in UsersTableTools.findUsersByName(cursor, keyword):
+		for user in UsersTableTools.findUsersByName(connection, keyword):
 			yield user
 
-		for user in UsersTableTools._usersByCityNotName(cursor, keyword):
-			yield UsersTableTools.getUser(cursor, user[0])
+		for user in UsersTableTools._usersByCityNotName(connection, keyword):
+			yield UsersTableTools.getUser(connection, user[0])
 
 	@staticmethod
-	def findUsersByName(cursor, keywords):
+	def findUsersByName(connection, keywords):
 		"""
 		Yield each user whose name contains any of the given keywords (sort by
 		name length)
@@ -402,11 +422,11 @@ class UsersTableTools:
 
 		statement = select + where + orderBy
 
-		for result in TableTools.yieldResults(cursor, statement):
-			yield UsersTableTools.getUser(cursor, result[0])
+		for result in TableTools.yieldResults(connection, statement):
+			yield UsersTableTools.getUser(connection, result[0])
 
 	@staticmethod
-	def _usersByCityNotName(cursor, keywords):
+	def _usersByCityNotName(connection, keywords):
 		"""
 		Yield each user whose city contains any of the given keywords, but
 		whose name does not contain any of the given keyword (sort by city
@@ -426,26 +446,28 @@ class UsersTableTools:
 
 		statement = select + where1 + where2 + orderBy
 
-		for result in TableTools.yieldResults(cursor, statement):
+		for result in TableTools.yieldResults(connection, statement):
 			yield result[0]
 
 	@staticmethod
-	def addUser(cursor, password, name, email, city, timezone, userID):
+	def addUser(connection, password, name, email, city, timezone, userID):
 		"""Add a new user"""
 
-		TableTools.insert(cursor, UsersTableTools._USERS_TABLE,
+		TableTools.insert(connection, UsersTableTools._USERS_TABLE,
 			[userID, password, name, email, city, timezone])
 
 	@staticmethod
-	def userExists(cursor, userID):
+	def userExists(connection, userID):
 		"""Return whether the user exists"""
 
-		return TableTools.itemExists(cursor, UsersTableTools._USERS_TABLE,
+		return TableTools.itemExists(connection, UsersTableTools._USERS_TABLE,
 			userID, "usr")
 
 	@staticmethod
-	def loginExists(cursor, userID, password):
+	def loginExists(connection, userID, password):
 		"""Return whether the given username, password combination exists"""
+
+		cursor = connection.cursor()
 
 		variables = {"userID": userID, "password": password}
 

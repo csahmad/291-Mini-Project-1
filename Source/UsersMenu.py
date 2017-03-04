@@ -7,7 +7,7 @@ class UsersMenu:
 	BACK_INDEX = 0
 	_INITIAL_INDEX = -1
 
-	def __init__(self, cursor, userID, preMessage = None,
+	def __init__(self, connection, userID, preMessage = None,
 		emptyMessage = "No users"):
 		"""
 		Arguments:
@@ -16,7 +16,7 @@ class UsersMenu:
 		empytMessage -- the message to display if the generator yields nothing
 		"""
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 		self._preMessage = preMessage
 		self._emptyMessage = emptyMessage
@@ -54,7 +54,7 @@ class UsersMenu:
 
 		# If a user was chosen, view the user
 		else:
-			viewUserMenu = ViewUserMenu(self._cursor, self._userID,
+			viewUserMenu = ViewUserMenu(self._connection, self._userID,
 				result.chosenItem)
 			result = viewUserMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed

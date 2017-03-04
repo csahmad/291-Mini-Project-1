@@ -7,9 +7,9 @@ class FollowersMenu:
 	BACK_INDEX = 0
 	_EMPTY_MESSAGE = "No followers"
 
-	def __init__(self, cursor, userID):
+	def __init__(self, connection, userID):
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 
 	def showAndGet(self):
@@ -18,10 +18,10 @@ class FollowersMenu:
 		FollowersMenu.BACK_INDEX
 		"""
 
-		userGenerator = FollowsTableTools.getFollowers(self._cursor,
+		userGenerator = FollowsTableTools.getFollowers(self._connection,
 			self._userID)
 
-		menu = UsersMenu(self._cursor, self._userID,
+		menu = UsersMenu(self._connection, self._userID,
 			emptyMessage = FollowersMenu._EMPTY_MESSAGE)
 
 		choice = menu.showAndGet(userGenerator)
@@ -37,13 +37,12 @@ if __name__ == "__main__":
 	from OracleTerminalConnection import OracleTerminalConnection
 	from LoginMenu import LoginMenu
 
-	# Get connection to database and cursor
+	# Get connection to database
 	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
 
-	user = LoginMenu.getUser(cursor)
+	user = LoginMenu.getUser(connection)
 
-	menu = FollowersMenu(cursor, user)
+	menu = FollowersMenu(connection, user)
 	print(menu.showAndGet())
 
 	connection.close()

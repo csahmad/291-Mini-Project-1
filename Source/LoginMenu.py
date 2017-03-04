@@ -18,16 +18,16 @@ class LoginMenu:
 		FormField("Timezone", isNumeric = True)]
 
 	@staticmethod
-	def getUser(cursor):
+	def getUser(connection):
 		"""
 		Show the menu and return the user ID or None (if an exit key is
 		pressed)
 		"""
 
-		return LoginMenu._showAndGet(cursor)
+		return LoginMenu._showAndGet(connection)
 
 	@staticmethod
-	def _showAndGet(cursor, loginFailed = False):
+	def _showAndGet(connection, loginFailed = False):
 		"""
 		Show the menu and return the user ID or None (if an exit key is
 		pressed)
@@ -51,12 +51,12 @@ class LoginMenu:
 		# If "Sign in" chosen
 		if choice == LoginMenu._SIGN_IN_INDEX:
 
-			userID = LoginMenu._login(cursor)
+			userID = LoginMenu._login(connection)
 
 			# If invalid login, got to main login/sign up menu with error
 			# message
 			if userID is None:
-				return LoginMenu._showAndGet(cursor, True)
+				return LoginMenu._showAndGet(connection, True)
 
 			return userID
 
@@ -69,10 +69,10 @@ class LoginMenu:
 			# If form submitted, add user to table and return user ID
 			if result.submitted:
 
-				userID = IDGenerator.getNewUserID(cursor)
+				userID = IDGenerator.getNewUserID(connection)
 				values = result.values
 
-				UsersTableTools.addUser(cursor, values["*Password"],
+				UsersTableTools.addUser(connection, values["*Password"],
 					values["Name"], values["Email"], values["City"],
 					values["Timezone"], userID)
 
@@ -84,14 +84,14 @@ class LoginMenu:
 
 			# If the cancel option was chosen, go to main login/sign up menu
 			else:
-				return LoginMenu._showAndGet(cursor, True)
+				return LoginMenu._showAndGet(connection, True)
 
 		# If "Exit" chosen
 		else:
 			return None
 
 	@staticmethod
-	def _login(cursor):
+	def _login(connection):
 		"""
 		Let the user login and return the user ID or None (if login failed)
 		"""
@@ -100,7 +100,7 @@ class LoginMenu:
 			integerUsername = True)
 		userID = int(userString)
 
-		if UsersTableTools.loginExists(cursor, userID, password):
+		if UsersTableTools.loginExists(connection, userID, password):
 			return userID
 
 		return None
@@ -110,11 +110,10 @@ if __name__ == "__main__":
 
 	from OracleTerminalConnection import OracleTerminalConnection
 
-	# Get connection to database and cursor
+	# Get connection to database
 	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
 
-	user = LoginMenu.getUser(cursor)
+	user = LoginMenu.getUser(connection)
 	print(user)
 
 	connection.close()

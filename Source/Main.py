@@ -12,12 +12,8 @@ class Main:
 	def main(commitChanges = False):
 		"""Run the program"""
 
-		# Get connection to database and cursor
 		connection = OracleTerminalConnection.connect()
-		cursor = connection.cursor()
-
-		Main._loginAndRun(cursor)        # Run
-
+		Main._loginAndRun(connection)
 		Main._commitAndExit(connection, commitChanges)
 
 	@staticmethod
@@ -40,16 +36,16 @@ class Main:
 		connection.close()
 
 	@staticmethod
-	def _loginAndRun(cursor):
+	def _loginAndRun(connection):
 		"""Let the user login/sign up and run the main menu"""
 
 		result = MainMenu.BACK_INDEX
 
 		while result == MainMenu.BACK_INDEX:
-			result = Main._loginAndRun_(cursor)
+			result = Main._loginAndRun_(connection)
 
 	@staticmethod
-	def _loginAndRun_(cursor):
+	def _loginAndRun_(connection):
 		"""
 		Let the user login/sign up and run the main menu
 
@@ -57,13 +53,13 @@ class Main:
 		None (if the user chose to exit)
 		"""
 
-		user = LoginMenu.getUser(cursor)
+		user = LoginMenu.getUser(connection)
 
 		# If an exit key was pressed, return None
 		if user is None: return None
 
 		# Run the main menu
-		mainMenu = MainMenu(cursor, user)
+		mainMenu = MainMenu(connection, user)
 		result = mainMenu.showAndGet()
 
 		# If an exit key was pressed, return None

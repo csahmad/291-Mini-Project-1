@@ -7,7 +7,7 @@ class TweetsMenu:
 	BACK_INDEX = 0
 	_INITIAL_INDEX = -1
 
-	def __init__(self, cursor, userID, tweetGenerator, preMessage = None,
+	def __init__(self, connection, userID, tweetGenerator, preMessage = None,
 		emptyMessage = "No tweets"):
 		"""
 		Arguments:
@@ -17,7 +17,7 @@ class TweetsMenu:
 		empytMessage -- the message to display if the generator yields nothing
 		"""
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 		self._tweetGenerator = tweetGenerator
 		self._preMessage = preMessage
@@ -55,7 +55,7 @@ class TweetsMenu:
 
 		# If a tweet was chosen, view the tweet
 		else:
-			viewTweetMenu = ViewTweetMenu(cursor, self._userID,
+			viewTweetMenu = ViewTweetMenu(self._connection, self._userID,
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed

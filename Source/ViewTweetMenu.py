@@ -3,6 +3,7 @@ from TerminalMenu import TerminalMenu
 from IDGenerator import IDGenerator
 from DateTools import DateTools
 from TerminalInterface import TerminalInterface
+from TweetTools import TweetTools
 
 class ViewTweetMenu:
 	"""The menu for viewing a tweet and replying to it or retweeting it"""
@@ -15,17 +16,17 @@ class ViewTweetMenu:
 	_OPTIONS_WITHOUT_RETWEET = ["Back", "Reply"]
 	_OPTIONS = ["Back", "Reply", "Retweet"]
 
-	def __init__(self, cursor, userID, tweet):
+	def __init__(self, connection, userID, tweet):
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
-		self._isRetweetedByUser = TweetsTableTools.isRetweetedByUser(cursor,
-			tweet.tweetID, userID)
+		self._isRetweetedByUser = TweetsTableTools.isRetweetedByUser(
+			connection, tweet.tweetID, userID)
 
 		self._tweet = tweet
-		self._tweetStats = TweetsTableTools.getTweetStats(cursor,
+		self._tweetStats = TweetsTableTools.getTweetStats(connection,
 			tweet.tweetID)
-		self._tweetString = str(tweet) + "\n\t" + str(self._tweetStats)
+		self._tweetString = None
 
 	def showAndGet(self):
 		"""
@@ -45,6 +46,8 @@ class ViewTweetMenu:
 		Show the menu and return either ViewTweetMenu.BACK_INDEX (if back
 		option chosen) or None (if an exit key was pressed)
 		"""
+
+		self._tweetString = str(self._tweet) + "\n\t" + str(self._tweetStats)
 
 		if self._isRetweetedByUser:
 
@@ -84,9 +87,9 @@ class ViewTweetMenu:
 		replyText = input("Reply:")
 		hashtags = TweetTools.getHashtags(replyText)
 		tweet = self._tweet
-		replyTweetID = IDGenerator.getNewTweetID(self._cursor)
+		replyTweetID = IDGenerator.getNewTweetID(self._connection)
 		replyDate = DateTools.getCurrentDate()
-		TweetsTableTools.addTweet(self._cursor, self._userID, replyDate,
+		TweetsTableTools.addTweet(self._connection, self._userID, replyDate,
 			replyText, replyTweetID, tweet.tweetID, hashtags)
 		self._tweetStats.addReply()
 
@@ -95,7 +98,7 @@ class ViewTweetMenu:
 
 		retweetDate = DateTools.getCurrentDate()
 		tweet = self._tweet
-		TweetsTableTools.retweet(cursor, tweet.tweetID, self._userID,
+		TweetsTableTools.retweet(self._connection, tweet.tweetID, self._userID,
 			retweetDate)
 		self._isRetweetedByUser = True
 		self._tweetStats.addRetweet()

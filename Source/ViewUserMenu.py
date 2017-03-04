@@ -14,18 +14,18 @@ class ViewUserMenu:
 	_OPTIONS = ["Follow", "View tweets", "Back"]
 	_OPTIONS_WITHOUT_FOLLOW = ["View tweets", "Back"]
 
-	def __init__(self, cursor, loginID, user):
+	def __init__(self, connection, loginID, user):
 		"""
 		Arguments:
 		loginID -- the ID of the signed in user
 		user -- the User object to view
 		"""
 
-		self._cursor = cursor
+		self._connection = connection
 		self._loginID = loginID
 		self._user = user
-		self._userStats = UsersTableTools.getUserStats(cursor, user.userID)
-		self._isFollowing = FollowsTableTools.isFollowing(cursor, loginID,
+		self._userStats = UsersTableTools.getUserStats(connection, user.userID)
+		self._isFollowing = FollowsTableTools.isFollowing(connection, loginID,
 			user.userID)
 
 	def showAndGet(self):
@@ -71,13 +71,13 @@ class ViewUserMenu:
 		# If user chose to follow, follow
 		elif choice == ViewUserMenu._FOLLOW_INDEX:
 			date = DateTools.getCurrentDate()
-			FollowsTableTools.follow(self._cursor, self._loginID,
+			FollowsTableTools.follow(self._connection, self._loginID,
 				self._user.userID, date)
 			self._isFollowing = True
 
 		# If user chose to view tweets, view tweets
 		else:
-			tweetsMenu = UserTweetsMenu(self._cursor, self._loginID,
+			tweetsMenu = UserTweetsMenu(self._connection, self._loginID,
 				self._user.userID)
 			result = tweetsMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed

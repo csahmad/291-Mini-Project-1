@@ -11,9 +11,9 @@ class SearchMenu:
 	BACK_INDEX = 2
 	_INITIAL_INDEX = -1
 
-	def __init__(self, cursor, userID):
+	def __init__(self, connection, userID):
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 
 	def showAndGet(self):
@@ -63,14 +63,14 @@ class SearchMenu:
 		"""Let the user enter a keyword and find matching tweets"""
 
 		TerminalInterface.tryClear()
-		menu = FindTweetMenu(self._cursor, self._userID)
+		menu = FindTweetMenu(self._connection, self._userID)
 		return menu.showAndGet()
 
 	def _findUser(self):
 		"""Let the user enter a keyword and find matching users"""
 
 		TerminalInterface.tryClear()
-		menu = FindUserMenu(self._cursor, self._userID)
+		menu = FindUserMenu(self._connection, self._userID)
 		return menu.showAndGet()
 
 # Interactive test
@@ -79,13 +79,12 @@ if __name__ == "__main__":
 	from OracleTerminalConnection import OracleTerminalConnection
 	from LoginMenu import LoginMenu
 
-	# Get connection to database and cursor
+	# Get connection to database
 	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
 
-	user = LoginMenu.getUser(cursor)
+	user = LoginMenu.getUser(connection)
 
-	searchMenu = SearchMenu(cursor, user)
+	searchMenu = SearchMenu(connection, user)
 	print(searchMenu.showAndGet())
 
 	connection.close()

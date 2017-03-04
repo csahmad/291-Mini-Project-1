@@ -9,13 +9,13 @@ class FindUserMenu:
 	BACK_INDEX = 0
 	_EMPTY_MESSAGE = "No matches"
 
-	def __init__(self, cursor, userID):
+	def __init__(self, connection, userID):
 		"""
 		Arguments:
 		userID -- the user ID of the signed in user
 		"""
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 
 	def showAndGet(self):
@@ -25,10 +25,10 @@ class FindUserMenu:
 		"""
 
 		keywords = input("Enter keywords:")
-		userGenerator = UsersTableTools.findUsers(self._cursor,
+		userGenerator = UsersTableTools.findUsers(self._connection,
 			re.split("\s|\s*,\s*", keywords))
 
-		menu = UsersMenu(self._cursor, self._userID,
+		menu = UsersMenu(self._connection, self._userID,
 			emptyMessage = FindUserMenu._EMPTY_MESSAGE)
 
 		choice = menu.showAndGet(userGenerator)
@@ -44,13 +44,12 @@ if __name__ == "__main__":
 	from OracleTerminalConnection import OracleTerminalConnection
 	from LoginMenu import LoginMenu
 
-	# Get connection to database and cursor
+	# Get connection to database
 	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
 
-	user = LoginMenu.getUser(cursor)
+	user = LoginMenu.getUser(connection)
 
-	menu = FindUserMenu(cursor, user)
+	menu = FindUserMenu(connection, user)
 	print(menu.showAndGet())
 
 	connection.close()

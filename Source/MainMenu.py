@@ -23,9 +23,9 @@ class MainMenu:
 	_OPTIONS = ["Post", "Search", "Followers", "Exit"]
 	_EMPTY_MESSAGE = "No tweets to display"
 
-	def __init__(self, cursor, userID):
+	def __init__(self, connection, userID):
 
-		self._cursor = cursor
+		self._connection = connection
 		self._userID = userID
 		self._tweetGenerator = None
 
@@ -49,7 +49,7 @@ class MainMenu:
 		"""
 
 		self._tweetGenerator = TweetsTableTools.getFolloweeTweetsByDate(
-			self._cursor, self._userID)
+			self._connection, self._userID)
 
 		menu = TerminalGeneratorMenu(self._tweetGenerator,
 			otherOptions = MainMenu._OPTIONS,
@@ -67,7 +67,7 @@ class MainMenu:
 
 		# If a tweet was chosen, view the tweet
 		if result.itemWasChosen():
-			viewTweetMenu = ViewTweetMenu(self._cursor, self._userID,
+			viewTweetMenu = ViewTweetMenu(self._connection, self._userID,
 				result.chosenItem)
 			result = viewTweetMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
@@ -82,13 +82,13 @@ class MainMenu:
 
 		# If user chose to search, open the search menu
 		elif choice == MainMenu._SEARCH_INDEX:
-			searchMenu = SearchMenu(self._cursor, self._userID)
+			searchMenu = SearchMenu(self._connection, self._userID)
 			result = searchMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
 
 		# If user chose to view followers, show followers
 		elif choice == MainMenu._FOLLOWERS_INDEX:
-			followersMenu = FollowersMenu(self._cursor, self._userID)
+			followersMenu = FollowersMenu(self._connection, self._userID)
 			result = followersMenu.showAndGet()
 			if result is None: return None        # If an exit key was pressed
 
@@ -101,9 +101,9 @@ class MainMenu:
 		tweetText = input("Post:")
 		hashtags = TweetTools.getHashtags(tweetText)
 		date = DateTools.getCurrentDate()
-		tweetID = IDGenerator.getNewTweetID(self._cursor)
-		TweetsTableTools.addTweet(self._cursor, self._userID, date, tweetText,
-			tweetID, None, hashtags)
+		tweetID = IDGenerator.getNewTweetID(self._connection)
+		TweetsTableTools.addTweet(self._connection, self._userID, date,
+			tweetText, tweetID, None, hashtags)
 
 # Interactive test
 if __name__ == "__main__":
@@ -111,17 +111,16 @@ if __name__ == "__main__":
 	from OracleTerminalConnection import OracleTerminalConnection
 	from LoginMenu import LoginMenu
 
-	# Get connection to database and cursor
+	# Get connection to database
 	connection = OracleTerminalConnection.connect()
-	cursor = connection.cursor()
 
-	user = LoginMenu.getUser(cursor)
+	user = LoginMenu.getUser(connection)
 
 	if user is None:
 		print("Bye")
 
 	else:
-		mainMenu = MainMenu(cursor, user)
+		mainMenu = MainMenu(connection, user)
 		print(mainMenu.showAndGet())
 
 	connection.close()
