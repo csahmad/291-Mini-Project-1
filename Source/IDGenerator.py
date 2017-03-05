@@ -25,7 +25,9 @@ class IDGenerator:
 
 		unique = 0
 
-		while TableTools.itemExists(cursor, tableName, unique, columnName):
+		while TableTools.itemExists(cursor, tableName, unique, columnName,
+			int):
+
 			unique += 1
 
 		return unique

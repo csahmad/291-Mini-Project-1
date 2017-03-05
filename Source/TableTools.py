@@ -7,6 +7,41 @@ class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
+	def execute(cursor, statement, variables = None, inputSizes = None,
+		stringsToFixedChars = True):
+		"""
+		Execute the given statement with the given cursor
+
+		Arguments:
+		cursor -- the cursor to execute the statement with
+		statement -- the SQL statement to execute
+		variables -- any variables to pass to Cursor.execute as a list (not
+			tuple) or dictionary
+		inputSizes -- a list (not tuple) or dictionary with the type of each
+			variable (in the same format as the arguments passed to
+			Cursor.setinputsizes)
+		stringsToFixedChars -- whether to convert each integer in inputSizes to
+			a cx_Oracle.FIXED_CHAR variable type with the length of the integer
+		"""
+
+		if inputSizes is not None:
+
+			if stringsToFixedChars:
+				TableTools.stringsToFixedChars(cursor, inputSizes)
+
+			if isinstance(inputSizes, dict):
+				cursor.setinputsizes(**inputSizes)
+
+			else:
+				cursor.setinputsizes(*inputSizes)
+
+		if variables is None:
+			cursor.execute(statement)
+
+		else:
+			cursor.execute(statement, variables)
+
+	@staticmethod
 	def stringsToFixedChars(cursor, inputSizes):
 		"""
 		For the given inputSizes, convert each integer (representing the
@@ -14,9 +49,9 @@ class TableTools:
 		cx_Oracle.FIXED_CHAR variable type with the length of the integer
 
 		Arguments:
-		inputSizes -- the inputSizes to convert, in the same format as
-			arguments passed to Cursor.setinputsizes
-			Can be a list (not tuple) or dictionary
+		inputSizes -- a list (not tuple) or dictionary with the type of each
+			variable (in the same format as the arguments passed to
+			Cursor.setinputsizes)
 		"""
 
 		if isinstance(inputSizes, dict):
@@ -47,27 +82,28 @@ class TableTools:
 		return cursor.var(cx_Oracle.FIXED_CHAR, integer)
 
 	@staticmethod
-	def exists(connection, tableName, columnValues):
+	def exists(connection, tableName, columnValues, inputSizes = None):
 		"""
 		Return whether the given column values exist in the given table
 
 		Arguments:
 		tableName -- the name of the table to check
 		columnValues -- a dictionary in the format {columnName: value}
+		inputSizes -- a list (not tuple) or dictionary with the type of each
+			variable (in the same format as the arguments passed to
+			Cursor.setinputsizes)
 		"""
 
 		cursor = connection.cursor()
 
-		variables = {}
+		variables = []
 		whereConditions = []
 
-		i = 0
+		i = 1
 
 		for column, value in columnValues.items():
-			valueString = "value{0}".format(i)
-			variableName = ":" + valueString
-			variables[valueString] = value
-			whereConditions.append("{0} = {1}".format(column, variableName))
+			variables.append(value)
+			whereConditions.append("{0} = :{1}".format(column, i))
 			i += 1
 
 		whereString = " and ".join(whereConditions)
@@ -75,44 +111,44 @@ class TableTools:
 		statement = "select unique * from {0} where {1}".format(tableName,
 			whereString)
 
-		cursor.execute(statement, variables)
+		TableTools.execute(cursor, statement, variables, inputSizes)
 		result = cursor.fetchone()
 
 		if result is None: return False
 		return True
 
 	@staticmethod
-	def itemExists(connection, tableName, item, columnName):
+	def itemExists(connection, tableName, item, columnName, inputSize = None):
 		"""
 		Return whether the given value exists in the given table
 
 		If no column name given, assume table only has one column
 		"""
 
+		if inputSize is not None:
+			inputSize = [inputSize]
+
 		cursor = connection.cursor()
 
-		variables = {"value": item}
+		variables = [item]
 
-		cursor.execute("select {0} from {1} where {0} = :value".format(
-			columnName, tableName), variables)
+		statement = "select {0} from {1} where {0} = :1".format(
+			columnName, tableName)
 
+		TableTools.execute(cursor, statement, variables, inputSize)
 		result = cursor.fetchone()
 
 		if result is None: return False
 		return True
 
 	@staticmethod
-	def yieldResults(connection, statement, variables = None):
+	def yieldResults(connection, statement, variables = None,
+		inputSizes = None):
 		"""Yield each result of the given statement"""
 
 		cursor = connection.cursor()
 
-		if variables is None:
-			cursor.execute(statement)
-
-		else:
-			cursor.execute(statement, variables)
-
+		TableTools.execute(cursor, statement, variables, inputSizes)
 		result = cursor.fetchone()
 
 		while result is not None:
@@ -121,7 +157,7 @@ class TableTools:
 
 	@staticmethod
 	def getCount(connection, tableName, condition = None, variables = None,
-		unique = False):
+		unique = False, inputSizes = None):
 		"""
 		Return the number of rows in the given table that match the given
 		condition
@@ -151,11 +187,7 @@ class TableTools:
 
 		statement = start + end
 
-		if variables is None:
-			cursor.execute(statement)
-
-		else:
-			cursor.execute(statement, variables)
+		TableTools.execute(cursor, statement, variables, inputSizes)
 
 		return cursor.fetchone()[0]
 
@@ -171,10 +203,9 @@ class TableTools:
 		values -- a collection (list/tuple) of collections (list/tuple) of
 			values, with each sub-collection entered into the table
 			For example, [("John", 22), ("Jane", 23)]
-		inputSizes -- a list/tuple with the type of each value to be inserted
-			or the maximum length of the value if the value is a string
-			For example, for the values [("Johnie", 22), ("Jane", 23)],
-			inputSizes might be (6, int)
+		inputSizes -- a list (not tuple) or dictionary with the type of each
+			variable (in the same format as the arguments passed to
+			Cursor.setinputsizes)
 		insertsAtOnce -- how many insert statements to combine into one (how
 			many collections of values to insert into the table at a time)
 		"""
@@ -193,9 +224,6 @@ class TableTools:
 		cursor = connection.cursor()
 		cursor.bindarraysize = insertsAtOnce
 
-		if inputSizes is not None:
-			cursor.setinputsizes(*inputSizes)
-
 		# Get a string of the variable names (eg. ":1, :2, :3")
 		variableNames = ", ".join([":" + str(i + 1) for i in range(length)])
 
@@ -203,44 +231,49 @@ class TableTools:
 			variableNames), values)
 
 	@staticmethod
-	def insert(connection, tableName, values):
+	def insert(connection, tableName, values, inputSizes = None):
 		"""Insert the given values (list/tuple) into the given table"""
 
 		cursor = connection.cursor()
 
-		variables = {}
+		variables = []
 		variableNames = []
 
 		for i in range(len(values)):
-			valueString = "value{0}".format(i)
-			variableNames.append(":" + valueString)
-			variables[valueString] = values[i]
+			variableNames.append(":{0}".format(i))
+			variables.append(values[i])
 
 		variableString = ", ".join(variableNames)
 
-		cursor.execute("insert into {0} values ({1})".format(tableName,
-			variableString), variables)
+		statement = "insert into {0} values ({1})".format(tableName,
+			variableString)
+
+		TableTools.execute(cursor, statement, variables, inputSizes)
 
 	@staticmethod
-	def insertItem(connection, tableName, value):
+	def insertItem(connection, tableName, value, inputSize = None):
 		"""Insert the given value into the given one-column table"""
 
+		if inputSize is not None:
+			inputSize = [inputSize]
+
 		cursor = connection.cursor()
-
-		variables = {"value": value}
-
-		cursor.execute("insert into {0} values (:value)".format(tableName),
-			variables)
+		variables = [value]
+		statement = "insert into {0} values (:1)".format(tableName)
+		TableTools.execute(cursor, statement, variables, inputSize)
 
 	@staticmethod
-	def insertItemIfNew(connection, tableName, value, columnName):
+	def insertItemIfNew(connection, tableName, value, columnName,
+		inputSize = None):
 		"""
 		Insert the given value into the given one-column table if the item does
 		not yet exist in the table
 		"""
 
-		if not TableTools.itemExists(connection, tableName, value, columnName):
-			TableTools.insertItem(connection, tableName, value)
+		if not TableTools.itemExists(connection, tableName, value, columnName,
+			inputSize):
+
+			TableTools.insertItem(connection, tableName, value, inputSize)
 
 class TweetsTableTools:
 	"""Tools for working with tweets"""
@@ -266,7 +299,7 @@ class TweetsTableTools:
 		"""Add a retweet to the 'Retweets' table"""
 
 		TableTools.insert(connection, TweetsTableTools._RETWEETS_TABLE,
-			[userID, tweetID, date])
+			[userID, tweetID, date], [int, int, cx_Oracle.DATETIME])
 
 	@staticmethod
 	def isRetweetedByUser(connection, tweetID, userID):
@@ -287,19 +320,19 @@ class TweetsTableTools:
 	def getRetweetCount(connection, tweetID):
 		"""Return the number of retweets the tweet with the given ID has"""
 
-		variables = {"tweetID": tweetID}
+		variables = [tweetID]
 
 		return TableTools.getCount(connection,
-			TweetsTableTools._RETWEETS_TABLE, "tid = :tweetID", variables)
+			TweetsTableTools._RETWEETS_TABLE, "tid = :1", variables)
 
 	@staticmethod
 	def getReplyCount(connection, tweetID):
 		"""Return the number of replies to the tweet with the given ID"""
 
-		variables = {"tweetID": tweetID}
+		variables = [tweetID]
 
 		return TableTools.getCount(connection, TweetsTableTools._TWEETS_TABLE,
-			"replyto = :tweetID", variables)
+			"replyto = :1", variables)
 
 	@staticmethod
 	def addTweet(connection, writer, date, text, tweetID, replyTo = None,
@@ -311,19 +344,20 @@ class TweetsTableTools:
 		"""
 
 		TableTools.insert(connection, TweetsTableTools._TWEETS_TABLE,
-			[tweetID, writer, date, text, replyTo])
+			[tweetID, writer, date, text, replyTo],
+			[int, int, cx_Oracle.DATETIME, 80, int])
 
 		mentionsValues = []
 
 		for hashtag in hashtags:
 
 			TableTools.insertItemIfNew(connection,
-				TweetsTableTools._HASHTAGS_TABLE, hashtag, "term")
+				TweetsTableTools._HASHTAGS_TABLE, hashtag, "term", 10)
 
 			mentionsValues.append((tweetID, hashtag))
 
 		TableTools.insertMany(connection, TweetsTableTools._MENTIONS_TABLE,
-			mentionsValues, (int, 10))
+			mentionsValues, [int, 10])
 
 	@staticmethod
 	def getFolloweeTweetsByDate(connection, follower):
@@ -338,12 +372,12 @@ class TweetsTableTools:
 		"""
 
 		columns = "tid, writer, tdate, text, replyto"
-		variables = {"follower": follower}
+		variables = [follower]
 
 		select = "select {0} from {1}, {2} ".format(columns,
 			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE)
 
-		where = "where flwer = :follower and writer = flwee "
+		where = "where flwer = :1 and writer = flwee "
 		orderBy = "order by tdate desc"
 
 		statement = select + where + orderBy
@@ -385,9 +419,9 @@ class FollowsTableTools:
 	def getFollowers(connection, followee):
 		"""Yield the user ID for each person following followee"""
 
-		variables = {"followee": followee}
+		variables = [followee]
 
-		statement = "select flwer from {0} where flwee = :followee".format(
+		statement = "select flwer from {0} where flwee = :1".format(
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(connection, statement,
@@ -399,9 +433,9 @@ class FollowsTableTools:
 	def getFollowing(connection, follower):
 		"""Yield the user ID for each person being followed by follower"""
 
-		variables = {"follower": follower}
+		variables = [follower]
 
-		statement = "select flwee from {0} where flwer = :follower".format(
+		statement = "select flwee from {0} where flwer = :1".format(
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(connection, statement,
@@ -414,7 +448,7 @@ class FollowsTableTools:
 		"""Make follower follow followee"""
 
 		TableTools.insert(connection, FollowsTableTools._FOLLOWS_TABLE,
-			[follower, followee, date])
+			[follower, followee, date], [int, int, cx_Oracle.DATETIME])
 
 	@staticmethod
 	def isFollowing(connection, follower, followee):
@@ -437,12 +471,13 @@ class UsersTableTools:
 		cursor = connection.cursor()
 
 		columns = "usr, name, email, city, timezone"
-		variables = {"userID": userID}
+		variables = (userID,)
+		inputSizes = [int]
 
-		statement = "select {0} from {1} where usr = :userID".format(columns,
+		statement = "select {0} from {1} where usr = :1".format(columns,
 			UsersTableTools._USERS_TABLE)
 
-		cursor.execute(statement, variables)
+		TableTools.execute(cursor, statement, variables, inputSizes)
 		result = cursor.fetchone()
 
 		return User(result[0], result[1], result[2], result[3], result[4])
@@ -459,28 +494,28 @@ class UsersTableTools:
 	def getTweetCount(connection, userID):
 		"""Return the number of tweets from the given user"""
 
-		variables = {"userID": userID}
+		variables = [userID]
 
 		return TableTools.getCount(connection, UsersTableTools._TWEETS_TABLE,
-			"writer = :userID", variables)
+			"writer = :1", variables)
 
 	@staticmethod
 	def getFollowingCount(connection, userID):
 		"""Return the number of people this user is following"""
 
-		variables = {"userID": userID}
+		variables = [userID]
 
 		return TableTools.getCount(connection, UsersTableTools._FOLLOWS_TABLE,
-			"flwer = :userID", variables)
+			"flwer = :1", variables)
 
 	@staticmethod
 	def getFollowerCount(connection, userID):
 		"""Return the number of people following this user"""
 
-		variables = {"userID": userID}
+		variables = [userID]
 
 		return TableTools.getCount(connection, UsersTableTools._FOLLOWS_TABLE,
-			"flwee = :userID", variables)
+			"flwee = :1", variables)
 
 	@staticmethod
 	def findUsers(connection, keyword):
@@ -503,10 +538,10 @@ class UsersTableTools:
 		"""
 
 		joinedKeywords = "|".join(keywords)
-		variables = {"keywords": joinedKeywords}
+		variables = [joinedKeywords]
 
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
-		where = "where regexp_like (name, :keywords, 'i') "
+		where = "where regexp_like (name, :1, 'i') "
 		orderBy = "order by length(usr) asc"
 
 		statement = select + where + orderBy
@@ -525,11 +560,11 @@ class UsersTableTools:
 		"""
 
 		joinedKeywords = "|".join(keywords)
-		variables = {"keywords": joinedKeywords}
+		variables = [joinedKeywords]
 
 		select = "select usr from {0} ".format(UsersTableTools._USERS_TABLE)
-		where1 = "where regexp_like (city, :keywords, 'i') and "
-		where2 = "not regexp_like (name, :keywords, 'i') "
+		where1 = "where regexp_like (city, :1, 'i') and "
+		where2 = "not regexp_like (name, :1, 'i') "
 		orderBy = "order by length(city) asc"
 
 		statement = select + where1 + where2 + orderBy
@@ -544,7 +579,8 @@ class UsersTableTools:
 		"""Add a new user"""
 
 		TableTools.insert(connection, UsersTableTools._USERS_TABLE,
-			[userID, password, name, email, city, timezone])
+			[userID, password, name, email, city, timezone],
+			[int, int, 20, 15, 12, int])
 
 	@staticmethod
 	def userExists(connection, userID):
@@ -559,14 +595,17 @@ class UsersTableTools:
 
 		cursor = connection.cursor()
 
-		variables = {"userID": userID, "password": password}
+		variables = (userID, password)
+		inputSizes = [int, 4]
 
 		select = "select usr, pwd from {0} ".format(
 			UsersTableTools._USERS_TABLE)
 
-		where = "where usr = :userID and pwd = :password"
+		where = "where usr = :1 and pwd = :2"
 
-		cursor.execute(select + where, variables)
+		statement = select + where
+
+		TableTools.execute(cursor, statement, variables, inputSizes)
 		result = cursor.fetchone()
 
 		if result is None: return False
