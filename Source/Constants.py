@@ -1,6 +1,9 @@
 class Constants:
 	"""Constants used in this program"""
 
+	COMMIT_CHANGES = False
+	"""Whether to commit changes to the database (or rollback)"""
+
 	USE_CLEAR = True
 	"""Set to False to prevent program from clearing terminal"""
 

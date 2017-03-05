@@ -1,3 +1,4 @@
+from Constants import Constants
 from OracleTerminalConnection import OracleTerminalConnection
 from LoginMenu import LoginMenu
 from TerminalInterface import TerminalInterface
@@ -9,7 +10,7 @@ class Main:
 	_EXIT_MESSAGE = "Bye"
 
 	@staticmethod
-	def main(commitChanges = False):
+	def main(commitChanges = Constants.COMMIT_CHANGES):
 		"""Run the program"""
 
 		connection = OracleTerminalConnection.connect()

@@ -1,5 +1,6 @@
 import cx_Oracle
 
+from Constants import Constants
 from TweetTools import Tweet, TweetStats
 from UserTools import User, UserStats
 
@@ -7,8 +8,10 @@ class TableTools:
 	"""Static methods for getting information about tables"""
 
 	@staticmethod
-	def execute(cursor, statement, variables = None, inputSizes = None,
-		statementsAtOnce = None, stringsToFixedChars = True):
+	def execute(connection, cursor, statement, variables = None,
+		inputSizes = None, statementsAtOnce = None,
+		stringsToFixedChars = True,
+		commit = Constants.COMMIT_CHANGES):
 		"""
 		Execute the given statement with the given cursor
 
@@ -25,6 +28,7 @@ class TableTools:
 			(bindarraysize)
 		stringsToFixedChars -- whether to convert each integer in inputSizes to
 			a cx_Oracle.FIXED_CHAR variable type with the length of the integer
+		commit -- whether to commit changes after executing the statement
 		"""
 
 		# If inputSizes given, pass it to cursor.setinputsizes
@@ -66,6 +70,9 @@ class TableTools:
 
 		else:
 			executeMethod(statement, variables)
+
+		if commit:
+			connection.commit()
 
 	@staticmethod
 	def stringsToFixedChars(cursor, inputSizes):
@@ -137,7 +144,9 @@ class TableTools:
 		statement = "select unique * from {0} where {1}".format(tableName,
 			whereString)
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
+
 		result = cursor.fetchone()
 
 		if result is None: return False
@@ -161,7 +170,7 @@ class TableTools:
 		statement = "select {0} from {1} where {0} = :1".format(
 			columnName, tableName)
 
-		TableTools.execute(cursor, statement, variables, inputSize)
+		TableTools.execute(connection, cursor, statement, variables, inputSize)
 		result = cursor.fetchone()
 
 		if result is None: return False
@@ -174,7 +183,9 @@ class TableTools:
 
 		cursor = connection.cursor()
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
+
 		result = cursor.fetchone()
 
 		while result is not None:
@@ -213,7 +224,8 @@ class TableTools:
 
 		statement = start + end
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
 
 		return cursor.fetchone()[0]
 
@@ -280,7 +292,7 @@ class TableTools:
 		statement = "insert into {0} values ({1})".format(tableName,
 			variableNames)
 
-		TableTools.execute(cursor, statement, values, inputSizes,
+		TableTools.execute(connection, cursor, statement, values, inputSizes,
 			insertsAtOnce)
 
 	@staticmethod
@@ -301,7 +313,8 @@ class TableTools:
 		statement = "insert into {0} values ({1})".format(tableName,
 			variableString)
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
 
 	@staticmethod
 	def insertItem(connection, tableName, value, inputSize = None):
@@ -313,7 +326,7 @@ class TableTools:
 		cursor = connection.cursor()
 		variables = [value]
 		statement = "insert into {0} values (:1)".format(tableName)
-		TableTools.execute(cursor, statement, variables, inputSize)
+		TableTools.execute(connection, cursor, statement, variables, inputSize)
 
 	@staticmethod
 	def insertItemIfNew(connection, tableName, value, columnName,
@@ -533,7 +546,9 @@ class UsersTableTools:
 		statement = "select {0} from {1} where usr = :1".format(columns,
 			UsersTableTools._USERS_TABLE)
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
+
 		result = cursor.fetchone()
 
 		return User(result[0], result[1], result[2], result[3], result[4])
@@ -661,7 +676,9 @@ class UsersTableTools:
 
 		statement = select + where
 
-		TableTools.execute(cursor, statement, variables, inputSizes)
+		TableTools.execute(connection, cursor, statement, variables,
+			inputSizes)
+
 		result = cursor.fetchone()
 
 		if result is None: return False
