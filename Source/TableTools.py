@@ -436,7 +436,7 @@ class TweetsTableTools:
 		statement = select + where + orderBy
 
 		for result in TableTools.yieldResults(connection, statement,
-			variables):
+			variables, [int]):
 
 			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
@@ -456,11 +456,14 @@ class TweetsTableTools:
 		select = "select {0} from {1} ".format(columns,
 			TweetsTableTools._TWEETS_TABLE)
 
+		where = "where writer = :1 "
 		orderBy = "order by tdate desc"
 
-		statement = select + orderBy
+		statement = select + where + orderBy
 
-		for result in TableTools.yieldResults(connection, statement):
+		for result in TableTools.yieldResults(connection, statement, [userID],
+			[int]):
+
 			yield Tweet(result[0], userID, result[1], result[2], result[3])
 
 class FollowsTableTools:
@@ -478,7 +481,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(connection, statement,
-			variables):
+			variables, [int]):
 
 			yield UsersTableTools.getUser(connection, result[0])
 
@@ -492,7 +495,7 @@ class FollowsTableTools:
 			FollowsTableTools._FOLLOWS_TABLE)
 
 		for result in TableTools.yieldResults(connection, statement,
-			variables):
+			variables, [int]):
 
 			yield UsersTableTools.getUser(connection, result[0])
 
