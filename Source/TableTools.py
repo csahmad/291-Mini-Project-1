@@ -44,6 +44,10 @@ class TableTools:
 		# If should only execute one statement, set executeMethod to
 		# cursor.execute
 		if statementsAtOnce is None or len(variables) == 1:
+
+			if statementsAtOnce is not None:
+				variables = variables[0]
+
 			executeMethod = cursor.execute
 
 		# If should execute many statements, set executeMethod to
@@ -214,8 +218,32 @@ class TableTools:
 		return cursor.fetchone()[0]
 
 	@staticmethod
-	def insertMany(connection, tableName, values, inputSizes = None,
-		insertsAtOnce = 20):
+	def insert(connection, tableName, values, inputSizes = None,
+		insertsAtOnce = None):
+		"""
+		Insert the given values (list/tuple) into the given table
+
+		Arguments:
+		tableName -- the name of the table to insert the values into
+		values -- the values to insert into the table
+		inputSizes -- a list (not tuple) or dictionary with the type of each
+			variable (in the same format as the arguments passed to
+			Cursor.setinputsizes)
+		insertsAtOnce -- how many insert statements to combine into one (how
+			many collections of values to insert into the table at a time)
+		"""
+
+		if insertsAtOnce is None:
+
+			return TableTools._insert(connection, tableName, values,
+				inputSizes)
+
+		return TableTools._insertMany(connection, tableName, values,
+			insertsAtOnce, inputSizes)
+
+	@staticmethod
+	def _insertMany(connection, tableName, values, insertsAtOnce,
+		inputSizes = None):
 		"""
 		Insert each collection (list/tuple) in values (list/tuple) into the
 		given table
@@ -246,14 +274,17 @@ class TableTools:
 		cursor = connection.cursor()
 		cursor.bindarraysize = insertsAtOnce
 
-		# Get a string of the variable names (eg. ":1, :2, :3")
-		variableNames = ", ".join([":" + str(i + 1) for i in range(length)])
+		# Get a string of the variable names (eg. ":0, :1, :2")
+		variableNames = ", ".join([":" + str(i) for i in range(length)])
 
-		cursor.executemany("insert into {0} values ({1})".format(tableName,
-			variableNames), values)
+		statement = "insert into {0} values ({1})".format(tableName,
+			variableNames)
+
+		TableTools.execute(cursor, statement, values, inputSizes,
+			insertsAtOnce)
 
 	@staticmethod
-	def insert(connection, tableName, values, inputSizes = None):
+	def _insert(connection, tableName, values, inputSizes = None):
 		"""Insert the given values (list/tuple) into the given table"""
 
 		cursor = connection.cursor()
@@ -378,8 +409,8 @@ class TweetsTableTools:
 
 			mentionsValues.append((tweetID, hashtag))
 
-		TableTools.insertMany(connection, TweetsTableTools._MENTIONS_TABLE,
-			mentionsValues, [int, 10])
+		TableTools.insert(connection, TweetsTableTools._MENTIONS_TABLE,
+			mentionsValues, [int, 10], insertsAtOnce = 50)
 
 	@staticmethod
 	def getFolloweeTweetsByDate(connection, follower):
