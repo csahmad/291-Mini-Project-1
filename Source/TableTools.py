@@ -8,24 +8,30 @@ class TableTools:
 
 	@staticmethod
 	def execute(cursor, statement, variables = None, inputSizes = None,
-		stringsToFixedChars = True):
+		statementsAtOnce = None, stringsToFixedChars = True):
 		"""
 		Execute the given statement with the given cursor
 
 		Arguments:
 		cursor -- the cursor to execute the statement with
 		statement -- the SQL statement to execute
-		variables -- any variables to pass to Cursor.execute as a list (not
+		variables -- any variables to pass to Cursor.execute or
+			Cursor.executemany (if statementsAtOnce not None) as a list (not
 			tuple) or dictionary
 		inputSizes -- a list (not tuple) or dictionary with the type of each
 			variable (in the same format as the arguments passed to
 			Cursor.setinputsizes)
+		statementsAtOnce -- how many statements to combine into one
+			(bindarraysize)
 		stringsToFixedChars -- whether to convert each integer in inputSizes to
 			a cx_Oracle.FIXED_CHAR variable type with the length of the integer
 		"""
 
+		# If inputSizes given, pass it to cursor.setinputsizes
 		if inputSizes is not None:
 
+			# Change string types to fixed char types (if that option is set to
+			# True)
 			if stringsToFixedChars:
 				TableTools.stringsToFixedChars(cursor, inputSizes)
 
@@ -35,11 +41,27 @@ class TableTools:
 			else:
 				cursor.setinputsizes(*inputSizes)
 
+		# If should only execute one statement, set executeMethod to
+		# cursor.execute
+		if statementsAtOnce is None or len(variables) == 1:
+			executeMethod = cursor.execute
+
+		# If should execute many statements, set executeMethod to
+		# cursor.executemany
+		else:
+
+			# If no values given, return
+			if len(variables) == 0:
+				return
+
+			cursor.bindarraysize = statementsAtOnce
+			executeMethod = cursor.executemany
+
 		if variables is None:
-			cursor.execute(statement)
+			executeMethod(statement)
 
 		else:
-			cursor.execute(statement, variables)
+			executeMethod(statement, variables)
 
 	@staticmethod
 	def stringsToFixedChars(cursor, inputSizes):
