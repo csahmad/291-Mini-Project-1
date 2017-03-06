@@ -407,12 +407,12 @@ class TweetsTableTools:
 			j=1
 			print("------------------------------")
 			for i in result:
-			print()
-			print("| %i | %s" %(j, i[0]))
-			print("      %s" %i[1])
-			print()
-			print("------------------------------")
-			j=j+1
+				print()
+				print("| %i | %s" %(j, i[0]))
+				print("      %s" %i[1])
+				print()
+				print("------------------------------")
+				j=j+1
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
