@@ -390,7 +390,7 @@ class TweetsTableTools:
 	
 		cursor.execute("{0} {1}".format(" union ".join(statements), "order by tdate desc"))
 		result = cursor.fetchall()
-		Search.printtweets(result)
+		TweetsTableTools.printtweets(result)
 		return result
 	
 	@staticmethod
