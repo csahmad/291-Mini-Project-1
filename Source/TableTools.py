@@ -389,9 +389,9 @@ class TweetsTableTools:
 
 		for i in keywords:
 				fi = Search.formatsearch(i)
-				statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate desc".format(fi))
+				statements.append("select text, tdate from tweets where upper(text) like '{0}'".format(fi))
 	
-		cursor.execute(" union ".join(statements))
+		cursor.execute(" union ".join(statements), "order by tdate desc"))
 		result = cursor.fetchall()
 		Search.printtweets(result)
 		return result
