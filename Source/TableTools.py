@@ -352,8 +352,8 @@ class TweetsTableTools:
 
 	@staticmethod
 	def formatsearch (keyword):
-        result = '%{0}%'.format(keyword.upper())
-        return result
+        	result = '%{0}%'.format(keyword.upper())
+        	return result
 
 	@staticmethod
 	def findTweets(connection, keywords):
@@ -364,54 +364,55 @@ class TweetsTableTools:
 		"""
 
 		first = keyword[0].strip()
-        if first=='#' :
-            TweetsTableTools.searchmentions(cursor, keyword.strip('#'))
-        else:
-            TweetsTableTools.searchtweet(cursor, keyword)
+        
+		if first=='#' :
+            		TweetsTableTools.searchmentions(cursor, keyword.strip('#'))
+        	else:
+            		TweetsTableTools.searchtweet(cursor, keyword)
 	
 	@staticmethod
 	def searchmentions(cursor, keyword):
-        print("to be searched %s" % keyword)
-        cursor.execute("select t.text, t.tdate from mentions m, tweets t where upper(m.term)='{0}' and t.tid=m.tid".format(keyword.upper()))
-        result = cursor.fetchall()
-        if len(result) != 0:
-            print("Hashtag Results")
+        	print("to be searched %s" % keyword)
+        	cursor.execute("select t.text, t.tdate from mentions m, tweets t where upper(m.term)='{0}' and t.tid=m.tid".format(keyword.upper()))
+        	result = cursor.fetchall()
+        	if len(result) != 0:
+            		print("Hashtag Results")
 
-        Search.printtweets(result)
-        return result
+        	Search.printtweets(result)
+        	return result
 
 	@staticmethod
-    def searchtweet(cursor, keyword):
-        keywords = keyword.split()
-        statements = []       
+    	def searchtweet(cursor, keyword):
+        	keywords = keyword.split()
+        	statements = []       
 
-        for i in keywords:
-            fi = Search.formatsearch(i)
-            statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate desc".format(fi))
+        	for i in keywords:
+            		fi = Search.formatsearch(i)
+            		statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate desc".format(fi))
         
-        cursor.execute(" union ".join(statements))
-        result = cursor.fetchall()
-        Search.printtweets(result)
-        return result
+        	cursor.execute(" union ".join(statements))
+        	result = cursor.fetchall()
+        	Search.printtweets(result)
+        	return result
 	
 	@staticmethod
 	def printtweets(result):
-        if len(result) == 0:
-            print("------------------------------")
-            print()
-            print("The search returned no items")
-            print()
-            print("------------------------------")
-        else:
-            j=1
-            print("------------------------------")
-            for i in result:
-                print()
-                print("| %i | %s" %(j, i[0]))
-                print("      %s" %i[1])
-                print()
-                print("------------------------------")
-                j=j+1
+        	if len(result) == 0:
+            		print("------------------------------")
+            		print()
+            		print("The search returned no items")
+            		print()
+            		print("------------------------------")
+        	else:
+            		j=1
+            		print("------------------------------")
+            		for i in result:
+                	print()
+                	print("| %i | %s" %(j, i[0]))
+                	print("      %s" %i[1])
+                	print()
+                	print("------------------------------")
+                	j=j+1
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
