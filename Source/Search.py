@@ -11,6 +11,7 @@ class Search:
             Search.searchmentions(cursor, keyword.strip('#'))
         else:
             Search.searchtweet(cursor, keyword)
+         
 
     def searchmentions(cursor, keyword):
         print("to be searched %s" % keyword)
@@ -28,11 +29,10 @@ class Search:
 
         for i in keywords:
             fi = Search.formatsearch(i)
-            statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate".format(fi))
+            statements.append("select text, tdate from tweets where upper(text) like '{0}'".format(fi))
         
-        print(" union ".join(statements))
-        cursor.execute(" union ".join(statements))
-        print("union".join(statements))
+        print("{0} {1}".format(" union ".join(statements), "order by tdate desc"))
+        cursor.execute("{0} {1}".format(" union ".join(statements), "order by tdate desc"))
         result = cursor.fetchall()
         Search.printtweets(result)
         return result

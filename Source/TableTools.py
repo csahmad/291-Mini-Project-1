@@ -362,6 +362,7 @@ class TweetsTableTools:
 
 		If a keyword starts with "#", interpret as hashtag
 		"""
+		cursor = connection.cursor()
 
 		first = keywords[0].strip()
 		
