@@ -388,7 +388,7 @@ class TweetsTableTools:
 				fi = TweetsTableTools.formatsearch(i)
 				statements.append("select text, tdate from tweets where upper(text) like '{0}'".format(fi))
 	
-		cursor.execute(" union ".join(statements), "order by tdate desc")
+		cursor.execute("{0} {1}".format(" union ".join(statements), "order by tdate desc"))
 		result = cursor.fetchall()
 		Search.printtweets(result)
 		return result
