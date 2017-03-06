@@ -28,9 +28,11 @@ class Search:
 
         for i in keywords:
             fi = Search.formatsearch(i)
-            statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate desc".format(fi))
+            statements.append("select text, tdate from tweets where upper(text) like '{0}' order by tdate".format(fi))
         
+        print(" union ".join(statements))
         cursor.execute(" union ".join(statements))
+        print("union".join(statements))
         result = cursor.fetchall()
         Search.printtweets(result)
         return result
@@ -48,7 +50,7 @@ class Search:
             for i in result:
                 print()
                 print("| %i | %s" %(j, i[0]))
-                print("      %s" %i[1])
+                print(i[1])
                 print()
                 print("------------------------------")
                 j=j+1
