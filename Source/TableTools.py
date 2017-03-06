@@ -383,8 +383,7 @@ class TweetsTableTools:
 		return result
 
 	@staticmethod
-	def searchtweet(cursor, keyword):
-		keywords = keyword.split()
+	def searchtweet(cursor, joinedKeywords):
 		statements = []       
 
 		for i in keywords:
