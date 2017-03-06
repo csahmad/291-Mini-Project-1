@@ -363,10 +363,8 @@ class TweetsTableTools:
 		If a keyword starts with "#", interpret as hashtag
 		"""
 		cursor = connection.cursor()
-
-		first = keywords[0].strip()
 		
-		if first=='#' :
+		if keywords[0]=='#' :
 			TweetsTableTools.searchmentions(cursor, keywords.strip('#'))
 		else:
 			TweetsTableTools.searchtweet(cursor, keywords)
@@ -383,14 +381,14 @@ class TweetsTableTools:
 		return result
 
 	@staticmethod
-	def searchtweet(cursor, joinedKeywords):
+	def searchtweet(cursor, keywords):
 		statements = []       
 
 		for i in keywords:
-				fi = Search.formatsearch(i)
+				fi = TweetsTableTools.formatsearch(i)
 				statements.append("select text, tdate from tweets where upper(text) like '{0}'".format(fi))
 	
-		cursor.execute(" union ".join(statements), "order by tdate desc"))
+		cursor.execute(" union ".join(statements), "order by tdate desc")
 		result = cursor.fetchall()
 		Search.printtweets(result)
 		return result
