@@ -384,7 +384,8 @@ class TweetsTableTools:
 
 	@staticmethod
 	def searchtweet(connection, keywords):
-		statements = []       
+		statements = []
+		variables = [keywords]
 
 		columns = "tid, tdate, text, replyto"
 
@@ -396,7 +397,7 @@ class TweetsTableTools:
 
 		print(statement)
 
-		for result in TableTools.yieldResults(connection, statement, None, [int]):
+		for result in TableTools.yieldResults(connection, statement,variables, [int]):
 
 			yield Tweet(result[0], result[1], result[2], result[3])
 
