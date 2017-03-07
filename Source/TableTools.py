@@ -364,6 +364,7 @@ class TweetsTableTools:
 		"""
 		
 		if keywords[0]=='#' :
+			print("searching hashtag")
 			result = TweetsTableTools.searchmentions(connection, keywords.strip('#'))
 		else:
 			result = TweetsTableTools.searchtweet(connection, keywords)
