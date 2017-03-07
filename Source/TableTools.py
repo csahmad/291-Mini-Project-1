@@ -363,8 +363,12 @@ class TweetsTableTools:
 		If a keyword starts with "#", interpret as hashtag
 		"""
 		
+<<<<<<< HEAD
 		if keywords[0]=='#' :
 			print("searching hashtag")
+=======
+		if keywords[0][0] =='#' :
+>>>>>>> 32a851f4b3bae55f1a582b9dd22cc1e16394512f
 			result = TweetsTableTools.searchmentions(connection, keywords.strip('#'))
 		else:
 			result = TweetsTableTools.searchtweet(connection, keywords)
