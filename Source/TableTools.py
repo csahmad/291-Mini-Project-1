@@ -361,6 +361,8 @@ class TweetsTableTools:
 		Find tweets that contain any of the given keywords
 
 		If a keyword starts with "#", interpret as hashtag
+
+		Assumption: user only entered one hashtag for a keyword to be searched
 		"""
 
 		if keywords[0][0] =='#' :
@@ -372,6 +374,9 @@ class TweetsTableTools:
 	
 	@staticmethod
 	def searchmentions(connection, keyword):
+    	"""
+		Helper method for findTweets for searching hashtags
+		"""
 		
 		columns = "t.tid, t.writer, t.tdate, t.text, t.replyto"
 		
@@ -383,6 +388,10 @@ class TweetsTableTools:
 
 	@staticmethod
 	def searchtweet(connection, keywords):
+    	"""
+		Helper method for findTweets to search for multiple keywords\
+		"""
+		
 		statements = []
 
 		columns = "tid, writer, tdate, text, replyto"
