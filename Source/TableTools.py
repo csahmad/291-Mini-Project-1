@@ -375,7 +375,7 @@ class TweetsTableTools:
 		
 		columns = "t.tid, t.tdate, t.text, t.replyto"
 		
-		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper()))
+		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper())
 
 		if len(result) != 0:
 			return result
