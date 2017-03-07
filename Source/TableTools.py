@@ -373,7 +373,7 @@ class TweetsTableTools:
 	@staticmethod
 	def searchmentions(connection, keyword):
 		
-		columns = "t.tid, t.tdate, t.text, t.replyto"
+		columns = "t.tid, t.writer, t.tdate, t.text, t.replyto"
 		
 		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper())
 
@@ -381,13 +381,13 @@ class TweetsTableTools:
 			return result
 		for result in TableTools.yieldResults(connection, statement):
     
-			yield Tweet(result[0], result[1], result[2], result[3])
+			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
 	def searchtweet(connection, keywords):
 		statements = []
 
-		columns = "tid, tdate, text, replyto"
+		columns = "tid, writer, tdate, text, replyto"
 
 		for i in keywords:
 				fi = TweetsTableTools.formatsearch(i)
@@ -397,7 +397,7 @@ class TweetsTableTools:
 
 		for result in TableTools.yieldResults(connection, statement):
 
-			yield Tweet(result[0], result[1], result[2], result[3])
+			yield Tweet(result[0], result[1], result[2], result[3], result[4])
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
