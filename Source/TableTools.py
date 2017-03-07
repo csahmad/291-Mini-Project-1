@@ -386,20 +386,20 @@ class TweetsTableTools:
 	def searchtweet(connection, keywords):
 		statements = []
 		print(len(keywords))
-		variables = [keywords]
+		variables = (keywords,)
 		print(variables)
 
 		columns = "tid, tdate, text, replyto"
 
 		for i in keywords:
 				fi = TweetsTableTools.formatsearch(i)
-				statements.append("select {0} where upper(text) like '{1}'".format(columns, fi))
+				statements.append("select {0} from tweets where upper(text) like '{1}'".format(columns,fi))
 	
 		statement = "{0} {1}".format(" union ".join(statements), "order by tdate desc")
 
 		print(statement)
 
-		for result in TableTools.yieldResults(connection, statement,variables, [int]):
+		for result in TableTools.yieldResults(connection, statement):
 
 			yield Tweet(result[0], result[1], result[2], result[3])
 
