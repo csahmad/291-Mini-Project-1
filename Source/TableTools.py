@@ -371,46 +371,34 @@ class TweetsTableTools:
 	
 	@staticmethod
 	def searchmentions(cursor, keyword):
-		print("to be searched %s" % keyword)
 		cursor.execute("select t.text, t.tdate from mentions m, tweets t where upper(m.term)='{0}' and t.tid=m.tid".format(keyword.upper()))
 		result = cursor.fetchall()
 		if len(result) != 0:
 			print("Hashtag Results")
+			Search.printtweets(result)
+			return result
 
-		Search.printtweets(result)
-		return result
+		else:
+    		return None
 
 	@staticmethod
 	def searchtweet(cursor, keywords):
 		statements = []       
 
+		columns = "tid, tdate, text, replyto"
+
 		for i in keywords:
 				fi = TweetsTableTools.formatsearch(i)
-				statements.append("select text, tdate from tweets where upper(text) like '{0}'".format(fi))
+				statements.append("select {0} where upper(text) like '{1}'".format(columns, fi))
 	
-		cursor.execute("{0} {1}".format(" union ".join(statements), "order by tdate desc"))
-		result = cursor.fetchall()
-		TweetsTableTools.printtweets(result)
-		return result
-	
-	@staticmethod
-	def printtweets(result):
-		if len(result) == 0:
-			print("------------------------------")
-			print()
-			print("The search returned no items")
-			print()
-			print("------------------------------")
-		else:
-			j=1
-			print("------------------------------")
-			for i in result:
-				print()
-				print("| %i | %s" %(j, i[0]))
-				print("      %s" %i[1])
-				print()
-				print("------------------------------")
-				j=j+1
+		statement = "{0} {1}".format(" union ".join(statements), "order by tdate desc")
+
+		print(statement)
+
+		for result in TableTools.yieldResults(connection, statement,
+			variables, [int]):
+
+			yield Tweet(result[0], result[1], result[2], result[3])
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
