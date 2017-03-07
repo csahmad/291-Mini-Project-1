@@ -365,9 +365,11 @@ class TweetsTableTools:
 		cursor = connection.cursor()
 		
 		if keywords[0]=='#' :
-			TweetsTableTools.searchmentions(cursor, keywords.strip('#'))
+			result = TweetsTableTools.searchmentions(cursor, keywords.strip('#'))
 		else:
-			TweetsTableTools.searchtweet(cursor, keywords)
+			result = TweetsTableTools.searchtweet(cursor, keywords)
+
+		return result
 	
 	@staticmethod
 	def searchmentions(cursor, keyword):
