@@ -482,7 +482,7 @@ class TweetsTableTools:
 		follower -- the ID of the follower
 		"""
 
-		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, u.usr, t.tdate, t.text, t.replyto"
 		variables = [follower]
 
 		select = "select {0} from {1} t, {2} f, users u ".format(columns,

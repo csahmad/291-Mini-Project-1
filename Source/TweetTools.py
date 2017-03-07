@@ -32,7 +32,7 @@ class Tweet:
 		else:
 			replyToString = "@{0} ".format(self._replyTo)
 
-		return "[{0}] -------------------------\n    {4}\n    {1} < @{2} >\n    : {3}{4}".format(self._tweetID, self._wname, replyToString, self._text, self._date)
+		return "[{0}] -------------------------\n    {5}\n    {1} ~ @{2}\n    : {3}{4}".format(self._tweetID, self._wname, self._usr, replyToString, self._text, self._date)
 
 	@property
 	def tweetID(self):
