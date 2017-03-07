@@ -377,9 +377,9 @@ class TweetsTableTools:
 		"""
 		Helper method for findTweets for searching hashtags
 		"""
-		columns = "t.tid, t.writer, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
 		
-		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper())
+		statement = "select {0} from mentions m, tweets t, users u where upper(m.term)='{1}' and t.tid=m.tid and u.usr = t.writer".format(columns, keyword.upper())
 
 		for result in TableTools.yieldResults(connection, statement):
 	
@@ -392,11 +392,11 @@ class TweetsTableTools:
 		"""
 		statements = []
 
-		columns = "tid, writer, tdate, text, replyto"
+		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
 
 		for i in keywords:
 				fi = TweetsTableTools.formatsearch(i)
-				statements.append("select {0} from tweets where upper(text) like '{1}'".format(columns,fi))
+				statements.append("select {0} from tweets t, users u where upper(text) like '{1}' and t.writer = u.usr".format(columns,fi))
 	
 		statement = "{0} {1}".format(" union ".join(statements), "order by tdate desc")
 
