@@ -344,6 +344,7 @@ class TableTools:
 class TweetsTableTools:
 	"""Tools for working with tweets"""
 
+	_USERS_TABLE = "Users"
 	_TWEETS_TABLE = "Tweets"
 	_FOLLOWS_TABLE = "Follows"
 	_HASHTAGS_TABLE = "Hashtags"
@@ -481,13 +482,13 @@ class TweetsTableTools:
 		follower -- the ID of the follower
 		"""
 
-		columns = "tid, writer, tdate, text, replyto"
+		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
 		variables = [follower]
 
-		select = "select {0} from {1}, {2} ".format(columns,
-			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE)
+		select = "select {0} from {1} f, {2} t, {3} u ".format(columns,
+			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE, TweetsTableTools._USERS_TABLE)
 
-		where = "where flwer = :1 and writer = flwee "
+		where = "where f.flwer = :1 and t.writer = f.flwee and t.writer = u.usr"
 		orderBy = "order by tdate desc"
 
 		statement = select + where + orderBy
