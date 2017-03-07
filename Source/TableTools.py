@@ -364,7 +364,7 @@ class TweetsTableTools:
 		"""
 
 		if keywords[0][0] =='#' :
-			result = TweetsTableTools.searchmentions(connection, keywords.strip('#'))
+			result = TweetsTableTools.searchmentions(connection, keywords[0].strip('#'))
 		else:
 			result = TweetsTableTools.searchtweet(connection, keywords)
 
