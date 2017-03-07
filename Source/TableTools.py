@@ -365,45 +365,49 @@ class TweetsTableTools:
 
 		Assumption: user only entered one hashtag for a keyword to be searched
 		"""
+		ht_keywords = []
+		rg_keywords = []				
 
-		if keywords[0][0] =='#' :
-			result = TweetsTableTools.searchmentions(connection, keywords[0].strip('#'))
+		for i in keywords:
+			if i[0] == '#':
+				ht_keywords.append(TweetsTableTools.searchmentions(connection, i.strip('#')))
+			else:
+				rg_keywords.append(TweetsTableTools.searchtweet(connection, i))
+		#just regular keywords
+		if ht_keywords is None:
+			statement = "{0} {1}".format(" union ".join(rg_keywords))
+		
+		elif rg_keywords is None:
+			statement = "{0} {1}".format(" union ".join(ht_keywords))
+
 		else:
-			result = TweetsTableTools.searchtweet(connection, keywords)
+			ht_statement = "{0} {1}".format(" union ".join(ht_keywords))
+			rg_statement = "{0} {1}".format(" union ".join(rg_keywords))
 
-		return result
+			statement = "{0} {1} group by tdate".format(ht_statements, rg_statements)
+		for result in TableTools.yieldResults(connection, statement):
+			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[6])
 	
 	@staticmethod
-	def searchmentions(connection, keyword):
+	def searchmentions(connection, keywords):
 		"""
 		Helper method for findTweets for searching hashtags
-		"""
+		"""		
+
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 		
-		statement = "select {0} from mentions m, tweets t, users u where upper(m.term)='{1}' and t.tid=m.tid and u.usr = t.writer".format(columns, keyword.upper())
-
-		for result in TableTools.yieldResults(connection, statement):
-	
-			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
+		return "select {0} from mentions m, tweets t, users u where upper(m.term)='{1}' and t.tid=m.tid and u.usr = t.writer".format(columns, i.upper()))
 
 	@staticmethod
 	def searchtweet(connection, keywords):
 		"""
 		Helper method for findTweets to search for multiple keywords
 		"""
-		statements = []
 
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 
-		for i in keywords:
-				fi = TweetsTableTools.formatsearch(i)
-				statements.append("select {0} from tweets t, users u where upper(text) like '{1}' and t.writer = u.usr".format(columns,fi))
-	
-		statement = "{0} {1}".format(" union ".join(statements), "order by tdate desc")
-
-		for result in TableTools.yieldResults(connection, statement):
-
-			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
+		fi = TweetsTableTools.formatsearch(i)
+		return "select {0} from tweets t, users u where upper(text) like '{1}' and t.writer = u.usr".format(columns,fi))
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
