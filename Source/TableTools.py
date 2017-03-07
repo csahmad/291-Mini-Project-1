@@ -489,7 +489,7 @@ class TweetsTableTools:
 			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE, TweetsTableTools._USERS_TABLE)
 
 		where = "where f.flwer = :1 and t.writer = f.flwee and t.writer = u.usr"
-		orderBy = "order by tdate desc"
+		orderBy = "order by t.tdate desc"
 
 		statement = select + where + orderBy
 
