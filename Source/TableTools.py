@@ -485,10 +485,10 @@ class TweetsTableTools:
 		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
 		variables = [follower]
 
-		select = "select {0} from {1} f, {2} t, {3} u ".format(columns,
-			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE, TweetsTableTools._USERS_TABLE)
+		select = "select {0} from {1} t, {2} f, users u ".format(columns,
+			TweetsTableTools._TWEETS_TABLE, TweetsTableTools._FOLLOWS_TABLE)
 
-		where = "where f.flwer = :1 and t.writer = f.flwee and t.writer = u.usr"
+		where = "where f.flwer = :1 and t.writer = f.flwee and t.writer = u.usr "
 		orderBy = "order by t.tdate desc"
 
 		statement = select + where + orderBy
