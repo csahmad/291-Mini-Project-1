@@ -362,17 +362,16 @@ class TweetsTableTools:
 
 		If a keyword starts with "#", interpret as hashtag
 		"""
-		cursor = connection.cursor()
 		
 		if keywords[0]=='#' :
-			result = TweetsTableTools.searchmentions(cursor, keywords.strip('#'))
+			result = TweetsTableTools.searchmentions(connection, keywords.strip('#'))
 		else:
-			result = TweetsTableTools.searchtweet(cursor, keywords)
+			result = TweetsTableTools.searchtweet(connection, keywords)
 
 		return result
 	
 	@staticmethod
-	def searchmentions(cursor, keyword):
+	def searchmentions(connection, keyword):
 		cursor.execute("select t.text, t.tdate from mentions m, tweets t where upper(m.term)='{0}' and t.tid=m.tid".format(keyword.upper()))
 		result = cursor.fetchall()
 		if len(result) != 0:
@@ -384,7 +383,7 @@ class TweetsTableTools:
     			return None
 
 	@staticmethod
-	def searchtweet(cursor, keywords):
+	def searchtweet(connection, keywords):
 		statements = []       
 
 		columns = "tid, tdate, text, replyto"
