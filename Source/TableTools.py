@@ -508,12 +508,12 @@ class TweetsTableTools:
 		userID -- the ID of the writer of the tweets
 		"""
 
-		columns = "tid, tdate, text, replyto"
+		columns = "u.name, t.tdate, t.text, t.replyto"
 
-		select = "select {0} from {1} ".format(columns,
+		select = "select {0} from {1} t, users u ".format(columns,
 			TweetsTableTools._TWEETS_TABLE)
 
-		where = "where writer = :1 "
+		where = "where writer = :1 and u.usr = t.writer"
 		orderBy = "order by tdate desc"
 
 		statement = select + where + orderBy
