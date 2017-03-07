@@ -378,13 +378,13 @@ class TweetsTableTools:
 		"""
 		Helper method for findTweets for searching hashtags
 		"""
-		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 		
 		statement = "select {0} from mentions m, tweets t, users u where upper(m.term)='{1}' and t.tid=m.tid and u.usr = t.writer".format(columns, keyword.upper())
 
 		for result in TableTools.yieldResults(connection, statement):
 	
-			yield Tweet(result[0], result[1], result[2], result[3], result[4])
+			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
 
 	@staticmethod
 	def searchtweet(connection, keywords):
@@ -393,7 +393,7 @@ class TweetsTableTools:
 		"""
 		statements = []
 
-		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 
 		for i in keywords:
 				fi = TweetsTableTools.formatsearch(i)
@@ -403,7 +403,7 @@ class TweetsTableTools:
 
 		for result in TableTools.yieldResults(connection, statement):
 
-			yield Tweet(result[0], result[1], result[2], result[3], result[4])
+			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
@@ -482,7 +482,7 @@ class TweetsTableTools:
 		follower -- the ID of the follower
 		"""
 
-		columns = "t.tid, u.name, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 		variables = [follower]
 
 		select = "select {0} from {1} t, {2} f, users u ".format(columns,
@@ -496,7 +496,7 @@ class TweetsTableTools:
 		for result in TableTools.yieldResults(connection, statement,
 			variables, [int]):
 
-			yield Tweet(result[0], result[1], result[2], result[3], result[4])
+			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
 
 	@staticmethod
 	def getTweetsByDate(connection, userID):
@@ -509,7 +509,7 @@ class TweetsTableTools:
 		userID -- the ID of the writer of the tweets
 		"""
 
-		columns = "u.name, t.tdate, t.text, t.replyto"
+		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 
 		select = "select {0} from {1} t, users u ".format(columns,
 			TweetsTableTools._TWEETS_TABLE)
@@ -522,7 +522,7 @@ class TweetsTableTools:
 		for result in TableTools.yieldResults(connection, statement, [userID],
 			[int]):
 
-			yield Tweet(result[0], userID, result[1], result[2], result[3])
+			yield Tweet(result[0], userID, result[1], result[2], result[3], result[4], result[5])
 
 class FollowsTableTools:
 	"""Tools for working with the 'Follows' table"""

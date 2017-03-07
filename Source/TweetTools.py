@@ -15,10 +15,11 @@ class TweetTools:
 class Tweet:
 	"""Represents a tweet"""
 
-	def __init__(self, tweetID, wname, date, text, replyTo = None):
+	def __init__(self, tweetID, wname, usr, date, text, replyTo = None):
 
 		self._tweetID = tweetID
 		self._wname = wname
+		self._usr = usr
 		self._date = date
 		self._text = text
 		self._replyTo = replyTo
@@ -31,7 +32,7 @@ class Tweet:
 		else:
 			replyToString = "@{0} ".format(self._replyTo)
 
-		return "[{0}] -------------------------\n    {4}\n    {1}\n    : {2}{3}".format(self._tweetID, self._wname, replyToString, self._text, self._date)
+		return "[{0}] -------------------------\n    {4}\n    {1} < @{2} >\n    : {3}{4}".format(self._tweetID, self._wname, replyToString, self._text, self._date)
 
 	@property
 	def tweetID(self):
@@ -41,9 +42,15 @@ class Tweet:
 
 	@property
 	def wname(self):
-		"""Return the writer of the tweet"""
+		"""Return the writer (name) of the tweet"""
 
 		return self._wname
+
+	@property
+	def usr(self):
+		"""Return the writer (user) of the tweet"""
+
+		return self._usr
 
 	@property
 	def date(self):
