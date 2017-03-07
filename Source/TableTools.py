@@ -385,7 +385,9 @@ class TweetsTableTools:
 	@staticmethod
 	def searchtweet(connection, keywords):
 		statements = []
+		print(len(keywords))
 		variables = [keywords]
+		print(variables)
 
 		columns = "tid, tdate, text, replyto"
 
