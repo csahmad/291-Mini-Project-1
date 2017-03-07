@@ -374,10 +374,9 @@ class TweetsTableTools:
 	
 	@staticmethod
 	def searchmentions(connection, keyword):
-    	"""
+		"""
 		Helper method for findTweets for searching hashtags
 		"""
-		
 		columns = "t.tid, t.writer, t.tdate, t.text, t.replyto"
 		
 		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper())
@@ -388,10 +387,9 @@ class TweetsTableTools:
 
 	@staticmethod
 	def searchtweet(connection, keywords):
-    	"""
-		Helper method for findTweets to search for multiple keywords\
 		"""
-		
+		Helper method for findTweets to search for multiple keywords
+		"""
 		statements = []
 
 		columns = "tid, writer, tdate, text, replyto"
