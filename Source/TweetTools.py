@@ -31,7 +31,7 @@ class Tweet:
 		else:
 			replyToString = "@{0} ".format(self._replyTo)
 
-		return "[{0}] {1}: {2}{3} ({4})".format(self._tweetID, self._writer,
+		return "{0} -------------------------\n    {4}\n    {1}: {2}{3}".format(self._tweetID, self._writer,
 			replyToString, self._text, self._date)
 
 	@property
