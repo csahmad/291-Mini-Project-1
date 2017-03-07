@@ -396,8 +396,7 @@ class TweetsTableTools:
 
 		print(statement)
 
-		for result in TableTools.yieldResults(connection, statement,
-			variables, [int]):
+		for result in TableTools.yieldResults(connection, statement, None, [int]):
 
 			yield Tweet(result[0], result[1], result[2], result[3])
 
