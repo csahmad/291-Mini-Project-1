@@ -372,15 +372,16 @@ class TweetsTableTools:
 	
 	@staticmethod
 	def searchmentions(connection, keyword):
-		cursor.execute("select t.text, t.tdate from mentions m, tweets t where upper(m.term)='{0}' and t.tid=m.tid".format(keyword.upper()))
-		result = cursor.fetchall()
-		if len(result) != 0:
-			print("Hashtag Results")
-			Search.printtweets(result)
-			return result
+		
+		columns = "t.tid, t.tdate, t.text, t.replyto"
+		
+		statement = "select {0} from mentions m, tweets t where upper(m.term)='{1}' and t.tid=m.tid".format(columns, keyword.upper()))
 
-		else:
-    			return None
+		if len(result) != 0:
+			return result
+		for result in TableTools.yieldResults(connection, statement):
+    
+			yield Tweet(result[0], result[1], result[2], result[3])
 
 	@staticmethod
 	def searchtweet(connection, keywords):
@@ -393,8 +394,6 @@ class TweetsTableTools:
 				statements.append("select {0} from tweets where upper(text) like '{1}'".format(columns,fi))
 	
 		statement = "{0} {1}".format(" union ".join(statements), "order by tdate desc")
-
-		print(statement)
 
 		for result in TableTools.yieldResults(connection, statement):
 
