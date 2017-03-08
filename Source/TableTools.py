@@ -362,21 +362,22 @@ class TweetsTableTools:
 		Find tweets that contain any of the given keywords
 
 		If a keyword starts with "#", interpret as hashtag
-		
 		"""
+
 		ht_keywords = []
-		rg_keywords = []				
+		rg_keywords = []
 
 		for i in keywords:
 			if i[0] == '#':
 				ht_keywords.append(TweetsTableTools.searchmentions(connection, i.strip('#')))
 			else:
 				rg_keywords.append(TweetsTableTools.searchtweet(connection, i))
+
 		#just regular keywords
-		if ht_keywords is None:
+		if len(ht_keywords) == 0:
 			statement = " union ".join(rg_keywords)
-		
-		elif rg_keywords is None:
+
+		elif len(rg_keywords) == 0:
 			statement = " union ".join(ht_keywords)
 
 		else:
@@ -384,19 +385,22 @@ class TweetsTableTools:
 			rg_statement = " union ".join(rg_keywords)
 
 			statement = "{0} union {1} order by tdate desc".format(ht_statement, rg_statement)
+
+		print(statement + "\n\n\n")
+
 		for result in TableTools.yieldResults(connection, statement):
 			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
-	
+
 	@staticmethod
 	def searchmentions(connection, keyword):
 		"""
 		Helper method for findTweets for searching hashtags
 		returns a statement (query) for searching that hashtag
-		
-		"""		
+
+		"""
 
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
-		
+
 		return "select {0} from mentions m, tweets t, users u where upper(m.term)='{1}' and t.tid=m.tid and u.usr = t.writer".format(columns, keyword.upper())
 
 	@staticmethod
@@ -404,7 +408,7 @@ class TweetsTableTools:
 		"""
 		Helper method for findTweets to search for multiple keywords
 		returns a statement (query) for searching a regular keyword
-		
+
 		"""
 
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
