@@ -37,7 +37,7 @@ class TerminalInterface:
 
 		keywordString = input("Enter keywords:")
 		if keywordString == "": return None
-		return re.split("\s|\s*,\s*", keywordString)
+		return re.split("\s|\s*,\s*", keywordString.rstrip())
 
 	@staticmethod
 	def alert(message, prompt = "\n(Press Enter to continue)"):
