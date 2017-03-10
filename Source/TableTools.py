@@ -74,9 +74,6 @@ class TableTools:
 		if commit:
 			connection.commit()
 
-		print(cursor.statement)
-		print(cursor.bindvars)
-
 	@staticmethod
 	def stringsToFixedChars(cursor, inputSizes):
 		"""
