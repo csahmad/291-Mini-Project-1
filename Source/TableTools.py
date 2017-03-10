@@ -367,8 +367,8 @@ class TweetsTableTools:
 		If a keyword starts with "#", interpret as hashtag
 		"""
 
-		values = []
-		inputTypes = []
+		values = {}
+		inputTypes = {}
 
 		ht_keywords = []
 		rg_keywords = []
@@ -379,18 +379,18 @@ class TweetsTableTools:
 
 			keyword = keywords[i];
 
-			index1 = i + 1
-
 			if keyword[0] == '#':
-				inputTypes.append(10)
-				values.append(keyword.strip('#').upper())
-				ht_keywords.append(TweetsTableTools.searchmentions(connection, index1))
+				variableName = "kw" + str(i)
+				inputTypes[variableName] = 10
+				values[variableName] = keyword.strip('#').upper()
+				ht_keywords.append(TweetsTableTools.searchmentions(connection, variableName))
 			else:
-				inputTypes.append(80)
-				index2 = length + index1
-				values.append(TweetsTableTools.formatsearch(keyword).upper())
+				variableName = "ht" + str(i)
+				inputTypes[variableName] = 80
+				values[variableName] = \
+					TweetsTableTools.formatsearch(keyword).upper()
 				rg_keywords.append(TweetsTableTools.searchtweet(connection,
-					index2))
+					variableName))
 
 		#just regular keywords
 		if len(ht_keywords) == 0:
@@ -411,7 +411,7 @@ class TweetsTableTools:
 			yield Tweet(result[0], result[1], result[2], result[3], result[4], result[5])
 
 	@staticmethod
-	def searchmentions(connection, index):
+	def searchmentions(connection, variableName):
 		"""
 		Helper method for findTweets for searching hashtags
 		returns a statement (query) for searching that hashtag
@@ -420,10 +420,10 @@ class TweetsTableTools:
 
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 
-		return "select {0} from mentions m, tweets t, users u where upper(m.term)=:{1} and t.tid=m.tid and u.usr = t.writer".format(columns, index)
+		return "select {0} from mentions m, tweets t, users u where upper(m.term)=:{1} and t.tid=m.tid and u.usr = t.writer".format(columns, variableName)
 
 	@staticmethod
-	def searchtweet(connection, index):
+	def searchtweet(connection, variableName):
 		"""
 		Helper method for findTweets to search for multiple keywords
 		returns a statement (query) for searching a regular keyword
@@ -432,7 +432,7 @@ class TweetsTableTools:
 
 		columns = "t.tid, u.name, t.writer, t.tdate, t.text, t.replyto"
 
-		return "select {0} from tweets t, users u where upper(text) like :{1} and t.writer = u.usr".format(columns, index)
+		return "select {0} from tweets t, users u where upper(text) like :{1} and t.writer = u.usr".format(columns, variableName)
 
 	@staticmethod
 	def retweet(connection, tweetID, userID, date):
