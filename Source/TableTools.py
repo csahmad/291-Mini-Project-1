@@ -379,9 +379,11 @@ class TweetsTableTools:
 
 			keyword = keywords[i];
 
+			index1 = i + 1
+
 			if keyword[0] == '#':
 				inputTypes.append(10)
-				values[""](keyword.strip('#').upper())
+				values.append(keyword.strip('#').upper())
 				ht_keywords.append(TweetsTableTools.searchmentions(connection, index1))
 			else:
 				inputTypes.append(80)
