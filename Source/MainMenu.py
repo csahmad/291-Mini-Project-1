@@ -99,16 +99,25 @@ class MainMenu:
 
 		TerminalInterface.tryClear()
 		tweetText = input("Post:")
+		hashtags = TweetTools.getHashtags(tweetText)
 
 		if tweetText == "":
 			TerminalInterface.alert("Empty tweet discarded")
 			return
+		
+		if len(tweetText) > 80:
+			TerminalInterface.alert("Tweet too long")
+			return
 
-		hashtags = TweetTools.getHashtags(tweetText)
+		for i in hashtags:
+			if len(i) > 10:
+				TerminalInterface.alert("Hashtag too long")
+				return
+
 		date = DateTools.getCurrentDate()
 		tweetID = IDGenerator.getNewTweetID(self._connection)
 		TweetsTableTools.addTweet(self._connection, self._userID, date,
-			tweetText, tweetID, None, hashtags)
+		tweetText, tweetID, None, hashtags)
 
 # Interactive test
 if __name__ == "__main__":
