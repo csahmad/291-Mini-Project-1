@@ -4,7 +4,7 @@ class Constants:
 	COMMIT_CHANGES = False
 	"""Whether to commit changes to the database (or rollback)"""
 
-	USE_CLEAR = False
+	USE_CLEAR = True
 	"""Set to False to prevent program from clearing terminal"""
 
 	CONNECTION_STRING = "gwynne.cs.ualberta.ca:1521/CRS"
