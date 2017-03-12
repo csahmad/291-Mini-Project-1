@@ -76,6 +76,8 @@ class LoginMenu:
 					values["Name"], values["Email"], values["City"],
 					values["Timezone"], userID)
 
+				TerminalInterface.alert("Thank you for registering {0}!\n your Login user ID: {1}\n".format(values["Name"], userID))
+
 				return userID
 
 			# If an exit key was pressed, return None
