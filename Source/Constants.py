@@ -1,7 +1,7 @@
 class Constants:
 	"""Constants used in this program"""
 
-	COMMIT_CHANGES = False
+	COMMIT_CHANGES = True
 	"""Whether to commit changes to the database (or rollback)"""
 
 	USE_CLEAR = True
